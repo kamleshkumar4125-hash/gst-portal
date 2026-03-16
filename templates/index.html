@@ -821,7 +821,9 @@ async function go(n){
   btn.disabled=true;btn.innerHTML='<span class="spin"></span>Running…';
   badge.className='sbadge b-run';badge.textContent='Running';row.classList.remove('active');prog.classList.add('show');
   let pct=0;const iv=setInterval(()=>{pct=Math.min(pct+Math.random()*14,88);fill.style.width=pct+'%';},200);
-  const fd=new FormData();fd.append('d110',files.d110);fd.append('backend',files.backend);if(files.einv)fd.append('einv',files.einv);
+  const fd=new FormData();
+  fd.append('hotel_id', currentHotelId);
+  // Files from File Manager (saved on server) — no need to attach
   try{
     const res=await fetch('/process/step'+n,{method:'POST',body:fd});
     if(!res.ok){const e=await res.json().catch(()=>({error:'Server error'}));throw new Error(e.error||'Server error');}
