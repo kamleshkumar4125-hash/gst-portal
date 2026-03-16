@@ -774,6 +774,8 @@ function sw(pageId, label) {
     document.getElementById('page-cs').classList.add('active');
   }
   document.getElementById('ptitle').innerHTML = titles[pageId] || label;
+  if(pageId === 'd110') loadFileManager('d110-page');
+  if(pageId === 'd140') loadFileManager('d140-page');
 }
 
 // Reco sub-tabs
