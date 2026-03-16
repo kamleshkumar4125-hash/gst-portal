@@ -322,6 +322,30 @@ input[type="file"] { display:none; }
 .spin{display:inline-block;width:12px;height:12px;border:2px solid rgba(255,255,255,0.35);border-top-color:white;border-radius:50%;animation:rot 0.7s linear infinite;vertical-align:middle;margin-right:4px}
 @keyframes rot{to{transform:rotate(360deg)}}
 ::-webkit-scrollbar{width:5px;height:5px} ::-webkit-scrollbar-thumb{background:#d0ccc4;border-radius:3px}
+
+/* ══ FILE MANAGER ══ */
+.fm-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:20px; }
+.fm-card {
+  background:white; border:1.5px solid var(--border); border-radius:10px;
+  padding:16px; position:relative; transition:all 0.2s;
+}
+.fm-card.has-file { border-color:rgba(39,174,96,0.4); background:#f6fff9; }
+.fm-card.has-file-orange { border-color:rgba(249,115,22,0.35); background:#fff8f3; }
+.fm-tag { font-family:var(--mono); font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color:var(--text3); margin-bottom:6px; }
+.fm-card.has-file .fm-tag { color:var(--green); }
+.fm-card.has-file-orange .fm-tag { color:var(--accent); }
+.fm-title { font-size:13px; font-weight:700; color:var(--text); margin-bottom:4px; }
+.fm-status { display:flex; align-items:center; gap:6px; font-size:11px; color:var(--text3); margin-bottom:10px; font-family:var(--mono); }
+.fm-status .sdot { width:6px; height:6px; border-radius:50%; background:#ccc; flex-shrink:0; }
+.fm-status .sdot.g { background:var(--green); box-shadow:0 0 5px var(--green); }
+.fm-status .sdot.o { background:#f59e0b; animation:blink 1.5s infinite; }
+.fm-btns { display:flex; gap:6px; }
+.fm-upload { flex:1; padding:6px; border-radius:6px; background:rgba(249,115,22,0.07); border:1.5px solid rgba(249,115,22,0.25); color:var(--accent); font-size:11px; font-weight:600; cursor:pointer; transition:all 0.18s; font-family:var(--sans); }
+.fm-upload:hover { background:var(--accent); color:white; }
+.fm-del { width:30px; height:30px; border-radius:6px; background:rgba(192,57,43,0.08); border:1.5px solid rgba(192,57,43,0.25); color:var(--red-b,#c0392b); font-size:14px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.18s; flex-shrink:0; }
+.fm-del:hover { background:#c0392b; color:white; }
+.fm-del:disabled { opacity:0.3; cursor:not-allowed; }
+.fm-size { font-family:var(--mono); font-size:9px; color:var(--text3); margin-top:4px; }
 </style>
 </head>
 <body>
@@ -599,33 +623,11 @@ input[type="file"] { display:none; }
 
     <!-- ══ D110 FOLIO WORKING ══ -->
     <div class="page active" id="page-d110">
-      <div class="sh"><h2>01 — Upload Files</h2><div class="sh-line"></div></div>
-      <div class="upload-grid">
-        <div class="up-card" id="card-backend">
-          <div class="up-tag">Static / One-time</div>
-          <div class="up-title">Backend Trx, SAC Mapping</div>
-          <div class="up-desc">Transaction → HSN / Rate mapping. Upload once per hotel setup.</div>
-          <div class="up-status"><span class="sdot" id="dot-backend"></span><span id="lbl-backend">Not uploaded</span></div>
-          <button class="up-btn" onclick="document.getElementById('f-backend').click()">+ Upload Excel</button>
-          <input type="file" id="f-backend" accept=".xlsx,.xlsm,.xls" onchange="doUpload('backend',this)">
-        </div>
-        <div class="up-card" id="card-d110">
-          <div class="up-tag">Monthly — Required</div>
-          <div class="up-title">D110 Dr. Base</div>
-          <div class="up-desc">Raw D110 debit export from Opera PMS. Required every month.</div>
-          <div class="up-status"><span class="sdot o" id="dot-d110"></span><span id="lbl-d110" style="color:#d97706">Required</span></div>
-          <button class="up-btn" onclick="document.getElementById('f-d110').click()">+ Upload Excel</button>
-          <input type="file" id="f-d110" accept=".xlsx,.xlsm,.xls" onchange="doUpload('d110',this)">
-        </div>
-        <div class="up-card" id="card-einv">
-          <div class="up-tag">Monthly — For Reco</div>
-          <div class="up-title">GSTR-4A E-Invoice</div>
-          <div class="up-desc">E-invoice from GSTN portal. Needed for D110 vs GSTR-1 reco.</div>
-          <div class="up-status"><span class="sdot o" id="dot-einv"></span><span id="lbl-einv" style="color:#d97706">Needed for Step 5</span></div>
-          <button class="up-btn" onclick="document.getElementById('f-einv').click()">+ Upload Excel</button>
-          <input type="file" id="f-einv" accept=".xlsx,.xlsm,.xls" onchange="doUpload('einv',this)">
-        </div>
+      <div class="sh"><h2>01 — File Manager</h2><div class="sh-line"></div></div>
+      <div class="fm-grid" id="d110-fm-grid">
+        <!-- Filled by JS -->
       </div>
+      <input type="file" id="fm-file-input" accept=".xlsx,.xlsm,.xls" style="display:none" onchange="fmUpload(this)">
 
       <div class="sh"><h2>02 — Process &amp; Download</h2><div class="sh-line"></div></div>
       <div class="steps-card">
@@ -651,32 +653,9 @@ input[type="file"] { display:none; }
     <!-- ══ D140 ══ -->
     <div class="page" id="page-d140">
       <!-- D140 UPLOAD + STEPS -->
-      <div class="sh"><h2>01 — Upload Files</h2><div class="sh-line"></div></div>
-      <div class="upload-grid">
-        <div class="up-card" id="d140-card-backend">
-          <div class="up-tag">Static / One-time</div>
-          <div class="up-title">Backend Trx, SAC Mapping</div>
-          <div class="up-desc">TRX Code → Tax Head / Rate / HSN mapping table.</div>
-          <div class="up-status"><span class="sdot" id="d140-dot-backend"></span><span id="d140-lbl-backend">Not uploaded</span></div>
-          <button class="up-btn" onclick="document.getElementById('d140-f-backend').click()">+ Upload Excel</button>
-          <input type="file" id="d140-f-backend" accept=".xlsx,.xlsm,.xls" onchange="d140Upload('backend',this)">
-        </div>
-        <div class="up-card" id="d140-card-d140">
-          <div class="up-tag">Monthly — Required</div>
-          <div class="up-title">D140 Dr (Journal)</div>
-          <div class="up-desc">Raw D140 cashier journal export from Opera PMS.</div>
-          <div class="up-status"><span class="sdot o" id="d140-dot-d140"></span><span id="d140-lbl-d140" style="color:#d97706">Required</span></div>
-          <button class="up-btn" onclick="document.getElementById('d140-f-d140').click()">+ Upload Excel</button>
-          <input type="file" id="d140-f-d140" accept=".xlsx,.xlsm,.xls" onchange="d140Upload('d140',this)">
-        </div>
-        <div class="up-card" id="d140-card-gl">
-          <div class="up-tag">Monthly — For GL Steps</div>
-          <div class="up-title">GL File (Peoplesoft)</div>
-          <div class="up-desc">GL journal export from Peoplesoft. Needed for Steps 3, 4, 5.</div>
-          <div class="up-status"><span class="sdot o" id="d140-dot-gl"></span><span id="d140-lbl-gl" style="color:#d97706">Needed for Steps 3-5</span></div>
-          <button class="up-btn" onclick="document.getElementById('d140-f-gl').click()">+ Upload Excel</button>
-          <input type="file" id="d140-f-gl" accept=".xlsx,.xlsm,.xls" onchange="d140Upload('gl',this)">
-        </div>
+      <div class="sh"><h2>01 — File Manager</h2><div class="sh-line"></div></div>
+      <div class="fm-grid" id="d140-fm-grid">
+        <!-- Filled by JS -->
       </div>
 
       <div class="sh"><h2>02 — Process &amp; Download</h2><div class="sh-line"></div></div>
@@ -977,6 +956,7 @@ async function d140go(n) {
   const iv = setInterval(() => { pct = Math.min(pct + Math.random()*14, 88); fill.style.width = pct+'%'; }, 200);
 
   const fd = new FormData();
+  fd.append('hotel_id', currentHotelId);
   if(d140Files.d140)    fd.append('d140',    d140Files.d140);
   if(d140Files.backend) fd.append('backend', d140Files.backend);
   if(d140Files.gl)      fd.append('gl',      d140Files.gl);
@@ -1028,14 +1008,151 @@ async function initPortal() {
     const data = await res.json();
     document.getElementById('user-name').textContent = data.full_name || data.username;
     if(data.hotels && data.hotels.length > 0) {
+      currentHotelId = data.hotels[0].id;
       document.getElementById('hotel-name').textContent = data.hotels[0].name;
     }
     if(data.role === 'admin') {
       document.getElementById('admin-link').style.display = 'inline-block';
     }
+    // Load file manager for active page
+    await loadFileManager('d110-page');
   } catch(e) { window.location='/login'; }
 }
 initPortal();
+
+
+// ══════════════════════════════════════════════════════════
+// FILE MANAGER
+// ══════════════════════════════════════════════════════════
+let currentHotelId = 1;
+let fmUploadType = null;
+let fmUploadPage = null;
+
+const FM_FILES = {
+  'd110-page': [
+    { type:'backend', label:'Backend Trx, SAC Mapping', tag:'Static / One-time',   required:true  },
+    { type:'d110',    label:'D110 Dr. Base',             tag:'Monthly — Required',  required:true  },
+    { type:'einv',    label:'GSTR-4A E-Invoice',         tag:'Monthly — For Reco',  required:false },
+  ],
+  'd140-page': [
+    { type:'backend', label:'Backend Trx, SAC Mapping', tag:'Static / One-time',     required:true  },
+    { type:'d140',    label:'D140 Dr (Journal)',          tag:'Monthly — Required',   required:true  },
+    { type:'gl',      label:'GL File (Peoplesoft)',        tag:'Monthly — GL Steps',  required:false },
+  ],
+};
+
+let savedFiles = {};  // type → {filename, size, uploaded_at}
+
+async function loadFileManager(page) {
+  try {
+    const res = await fetch(`/api/files/${currentHotelId}`);
+    const files = await res.json();
+    savedFiles = {};
+    files.forEach(f => { savedFiles[f.file_type] = f; });
+    renderFMGrid(page);
+  } catch(e) {
+    console.error('FM load error:', e);
+  }
+}
+
+function renderFMGrid(page) {
+  const defs = FM_FILES[page] || [];
+  const gridId = page === 'd110-page' ? 'd110-fm-grid' : 'd140-fm-grid';
+  const grid = document.getElementById(gridId);
+  if(!grid) return;
+
+  grid.innerHTML = defs.map(def => {
+    const saved = savedFiles[def.type];
+    const hasSaved = !!saved;
+    const cardClass = hasSaved ? (def.type==='backend' ? 'has-file' : 'has-file-orange') : '';
+    const dotClass  = hasSaved ? 'g' : (def.required ? 'o' : '');
+    const statusText = hasSaved
+      ? `<span style="color:${def.type==='backend'?'var(--green)':'var(--accent)'}">${saved.filename}</span>`
+      : (def.required ? `<span style="color:#d97706">Required</span>` : `<span>Not uploaded</span>`);
+    const sizeText = hasSaved ? fmSize(saved.file_size) : '';
+
+    return `
+    <div class="fm-card ${cardClass}" id="fm-card-${def.type}">
+      <div class="fm-tag">${def.tag}</div>
+      <div class="fm-title">${def.label}</div>
+      <div class="fm-status"><span class="sdot ${dotClass}"></span>${statusText}</div>
+      ${hasSaved ? `<div class="fm-size">${sizeText} · ${saved.uploaded_at?.slice(0,16)||''}</div>` : ''}
+      <div class="fm-btns" style="margin-top:10px">
+        <button class="fm-upload" onclick="fmTrigger('${def.type}','${page}')">
+          ${hasSaved ? '↺ Re-upload' : '+ Upload Excel'}
+        </button>
+        <button class="fm-del" onclick="fmDelete('${def.type}')" ${!hasSaved?'disabled':''} title="Delete">🗑</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function fmSize(bytes) {
+  if(!bytes) return '';
+  if(bytes < 1024) return bytes+'B';
+  if(bytes < 1024*1024) return (bytes/1024).toFixed(1)+'KB';
+  return (bytes/1024/1024).toFixed(1)+'MB';
+}
+
+function fmTrigger(fileType, page) {
+  fmUploadType = fileType;
+  fmUploadPage = page;
+  document.getElementById('fm-file-input').click();
+}
+
+async function fmUpload(input) {
+  const file = input.files[0];
+  if(!file || !fmUploadType) return;
+  input.value = '';
+
+  const fd = new FormData();
+  fd.append('hotel_id', currentHotelId);
+  fd.append('file_type', fmUploadType);
+  fd.append('file', file);
+
+  toast('Uploading ' + file.name + '…', 'info');
+  try {
+    const res = await fetch('/api/files/upload', {method:'POST', body:fd});
+    const data = await res.json();
+    if(res.ok) {
+      toast('✓ ' + file.name + ' saved!', 'success');
+      await loadFileManager(fmUploadPage || 'd110-page');
+      // Also re-enable steps
+      d110CheckEnable();
+    } else {
+      toast('Error: ' + data.error, 'error');
+    }
+  } catch(e) {
+    toast('Upload failed: ' + e.message, 'error');
+  }
+}
+
+async function fmDelete(fileType) {
+  if(!confirm('Delete this file from server?')) return;
+  const res = await fetch(`/api/files/delete/${currentHotelId}/${fileType}`, {method:'DELETE'});
+  const data = await res.json();
+  if(res.ok) {
+    toast(data.message, 'success');
+    await loadFileManager(fmUploadPage || 'd110-page');
+  } else {
+    toast('Error deleting', 'error');
+  }
+}
+
+function d110CheckEnable() {
+  const hasBackend = !!savedFiles['backend'];
+  const hasD110    = !!savedFiles['d110'];
+  const hasEinv    = !!savedFiles['einv'];
+  [1,2,3,4].forEach(n => { if(hasD110 && hasBackend && !done[n]) enableStep(n); });
+  if(hasD110 && hasBackend && hasEinv && !done[5]) enableStep(5);
+}
+
+// Override go() to include hotel_id
+const _origGo = go;
+async function go(n) {
+  // Inject hotel_id into FormData — handled inside go via hotel_id field
+  await _origGo(n);
+}
 
 function toast(msg,type='info'){const t=document.getElementById('toast');const ic=type==='success'?'✓ ':type==='error'?'✕ ':'ℹ ';t.textContent=ic+msg;t.className='toast '+type+' show';setTimeout(()=>t.classList.remove('show'),3500);}
 </script>
