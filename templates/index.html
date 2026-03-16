@@ -927,7 +927,9 @@ function d140Upload(key, inp) {
 }
 
 function d140CheckEnable() {
-  const d = !!d140Files.d140, b = !!d140Files.backend, g = !!d140Files.gl;
+  const d = !!d140Files.d140 || !!savedFiles['d140'];
+  const b = !!d140Files.backend || !!savedFiles['backend'];
+  const g = !!d140Files.gl || !!savedFiles['gl'];
   if(d && b) { [1,2].forEach(n => { if(!d140Done[n]) d140Enable(n); }); }
   if(g)      { [3,4].forEach(n => { if(!d140Done[n]) d140Enable(n); }); }
   if(d && b && g) { if(!d140Done[5]) d140Enable(5); }
@@ -1050,6 +1052,9 @@ async function loadFileManager(page) {
     savedFiles = {};
     files.forEach(f => { savedFiles[f.file_type] = f; });
     renderFMGrid(page);
+    // Enable steps if files already saved
+    if(page === 'd110-page') d110CheckEnable();
+    if(page === 'd140-page') d140CheckEnable();
   } catch(e) {
     console.error('FM load error:', e);
   }
@@ -1140,9 +1145,9 @@ async function fmDelete(fileType) {
 }
 
 function d110CheckEnable() {
-  const hasBackend = !!savedFiles['backend'];
-  const hasD110    = !!savedFiles['d110'];
-  const hasEinv    = !!savedFiles['einv'];
+  const hasBackend = !!savedFiles['backend'] || !!(files && files.backend);
+  const hasD110    = !!savedFiles['d110']    || !!(files && files.d110);
+  const hasEinv    = !!savedFiles['einv']    || !!(files && files.einv);
   [1,2,3,4].forEach(n => { if(hasD110 && hasBackend && !done[n]) enableStep(n); });
   if(hasD110 && hasBackend && hasEinv && !done[5]) enableStep(5);
 }
