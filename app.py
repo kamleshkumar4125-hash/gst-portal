@@ -869,11 +869,6 @@ def load_and_process():
         hotel_id = h['id'] if h else 1
     # D110 — required
     d110_bytes = get_file_bytes(hotel_id, 'd110', 'd110')
-    if hotel_id == 0:
-    conn2 = get_db()
-    h = conn2.execute("SELECT id FROM hotels LIMIT 1").fetchone()
-    conn2.close()
-    hotel_id = h['id'] if h else 1
     if not d110_bytes: raise ValueError('D110 Dr.Base file required — upload karo ya saved file use karo')
     # Backend — required
     back_bytes = get_file_bytes(hotel_id, 'backend', 'backend')
