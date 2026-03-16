@@ -1605,13 +1605,13 @@ def make_opera_vs_gl(processed, headers, gl_rows):
 # ══════════════════════════════════════════════════════════
 
 def load_d140():
-    """Common loader for D140 routes"""
-    d140f   = request.files.get('d140')
-    backf   = request.files.get('backend')
-    if not d140f or not backf:
+    hid = get_hotel_id()
+    d140_bytes = get_file_bytes(hid, 'd140', 'd140')
+    back_bytes = get_file_bytes(hid, 'backend', 'backend')
+    if not d140_bytes or not back_bytes:
         return None, None, None, 'D140 + Backend required'
-    d140_rows    = get_sheet(read_wb(d140f.read()), 'D140 Dr')
-    backend_rows = get_sheet(read_wb(backf.read()), 'Backend Trx,SAC_Mapping')
+    d140_rows    = get_sheet(read_wb(d140_bytes), 'D140 Dr')
+    backend_rows = get_sheet(read_wb(back_bytes), 'Backend Trx,SAC_Mapping')
     return d140_rows, backend_rows, None, None
 
 
@@ -1647,9 +1647,10 @@ def d140_step2():
 @login_required
 def d140_step3():
     try:
-        glf = request.files.get('gl')
-        if not glf: return jsonify({'error': 'GL file required'}), 400
-        gl_rows = get_sheet(read_wb(glf.read()), 'GL')
+        hid = get_hotel_id()
+        gl_bytes = get_file_bytes(hid, 'gl', 'gl')
+        if not gl_bytes: return jsonify({'error': 'GL file required'}), 400
+        gl_rows = get_sheet(read_wb(gl_bytes), 'GL')
         wb, _ = make_proc_gl(gl_rows)
         return send_wb(wb, 'Proc_GL.xlsx')
     except Exception as e:
@@ -1661,9 +1662,10 @@ def d140_step3():
 @login_required
 def d140_step4():
     try:
-        glf = request.files.get('gl')
-        if not glf: return jsonify({'error': 'GL file required'}), 400
-        gl_rows = get_sheet(read_wb(glf.read()), 'GL')
+        hid = get_hotel_id()
+        gl_bytes = get_file_bytes(hid, 'gl', 'gl')
+        if not gl_bytes: return jsonify({'error': 'GL file required'}), 400
+        gl_rows = get_sheet(read_wb(gl_bytes), 'GL')
         wb = make_gl_summary(gl_rows)
         return send_wb(wb, 'GL_Summary.xlsx')
     except Exception as e:
@@ -1675,14 +1677,15 @@ def d140_step4():
 @login_required
 def d140_step5():
     try:
-        d140f = request.files.get('d140')
-        backf = request.files.get('backend')
-        glf   = request.files.get('gl')
-        if not d140f or not backf or not glf:
+        hid = get_hotel_id()
+        d140_bytes = get_file_bytes(hid, 'd140', 'd140')
+        back_bytes = get_file_bytes(hid, 'backend', 'backend')
+        gl_bytes   = get_file_bytes(hid, 'gl', 'gl')
+        if not d140_bytes or not back_bytes or not gl_bytes:
             return jsonify({'error': 'D140 + Backend + GL required'}), 400
-        d140_rows    = get_sheet(read_wb(d140f.read()), 'D140 Dr')
-        backend_rows = get_sheet(read_wb(backf.read()), 'Backend Trx,SAC_Mapping')
-        gl_rows      = get_sheet(read_wb(glf.read()), 'GL')
+        d140_rows    = get_sheet(read_wb(d140_bytes), 'D140 Dr')
+        backend_rows = get_sheet(read_wb(back_bytes), 'Backend Trx,SAC_Mapping')
+        gl_rows      = get_sheet(read_wb(gl_bytes), 'GL')
         mapping = build_d140_mapping(backend_rows)
         processed, headers = process_d140(d140_rows, mapping)
         wb = make_opera_vs_gl(processed, headers, gl_rows)
