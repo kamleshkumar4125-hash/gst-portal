@@ -65,6 +65,21 @@ def init_db():
         FOREIGN KEY (user_id) REFERENCES users(id)
     )''')
 
+    # Saved files — hotel-wise persistent file storage
+    c.execute('''CREATE TABLE IF NOT EXISTS saved_files (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        hotel_id INTEGER NOT NULL,
+        file_type TEXT NOT NULL,
+        filename TEXT NOT NULL,
+        file_data BLOB NOT NULL,
+        file_size INTEGER,
+        uploaded_by INTEGER,
+        uploaded_at TEXT DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(hotel_id, file_type),
+        FOREIGN KEY (hotel_id) REFERENCES hotels(id),
+        FOREIGN KEY (uploaded_by) REFERENCES users(id)
+    )''')
+
     # Create default admin if not exists
     admin_exists = c.execute("SELECT id FROM users WHERE username='admin'").fetchone()
     if not admin_exists:
@@ -153,6 +168,96 @@ def send_wb(wb, filename):
     return send_file(buf, download_name=filename,
                      as_attachment=True,
                      mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+
+
+# ══════════════════════════════════════════════════════════
+# SAVED FILES API
+# ══════════════════════════════════════════════════════════
+
+FILE_TYPES = {
+    'backend':  'Backend Trx, SAC Mapping',
+    'd110':     'D110 Dr. Base',
+    'd140':     'D140 Dr (Journal)',
+    'gl':       'GL File (Peoplesoft)',
+    'tb':       'Trial Balance (TB)',
+    'einv':     'GSTR-4A E-Invoice',
+}
+
+def save_file_to_db(hotel_id, file_type, filename, file_bytes):
+    conn = get_db()
+    conn.execute("""
+        INSERT OR REPLACE INTO saved_files
+        (hotel_id, file_type, filename, file_data, file_size, uploaded_by)
+        VALUES (?,?,?,?,?,?)
+    """, (hotel_id, file_type, filename, file_bytes, len(file_bytes), session.get('user_id')))
+    conn.commit()
+    conn.close()
+
+def load_file_from_db(hotel_id, file_type):
+    conn = get_db()
+    row = conn.execute(
+        "SELECT * FROM saved_files WHERE hotel_id=? AND file_type=?",
+        (hotel_id, file_type)
+    ).fetchone()
+    conn.close()
+    return dict(row) if row else None
+
+def get_file_bytes(hotel_id, file_type, request_file_key):
+    """Get file bytes — from request if uploaded, else from DB"""
+    f = request.files.get(request_file_key)
+    if f and f.filename:
+        return f.read()
+    # Try saved DB
+    saved = load_file_from_db(hotel_id, file_type)
+    if saved:
+        return bytes(saved['file_data'])
+    return None
+
+@app.route('/api/files/<int:hotel_id>', methods=['GET'])
+@login_required
+def list_saved_files(hotel_id):
+    conn = get_db()
+    rows = conn.execute("""
+        SELECT sf.id, sf.file_type, sf.filename, sf.file_size, sf.uploaded_at,
+               u.full_name as uploaded_by_name
+        FROM saved_files sf
+        LEFT JOIN users u ON sf.uploaded_by = u.id
+        WHERE sf.hotel_id = ?
+        ORDER BY sf.uploaded_at DESC
+    """, (hotel_id,)).fetchall()
+    conn.close()
+    return jsonify([dict(r) for r in rows])
+
+@app.route('/api/files/upload', methods=['POST'])
+@login_required
+def upload_saved_file():
+    hotel_id  = request.form.get('hotel_id')
+    file_type = request.form.get('file_type')
+    f = request.files.get('file')
+
+    if not hotel_id or not file_type or not f:
+        return jsonify({'error': 'hotel_id, file_type and file required'}), 400
+    if file_type not in FILE_TYPES:
+        return jsonify({'error': 'Invalid file type'}), 400
+
+    file_bytes = f.read()
+    save_file_to_db(int(hotel_id), file_type, f.filename, file_bytes)
+    return jsonify({
+        'success': True,
+        'message': f'{FILE_TYPES[file_type]} saved for hotel',
+        'filename': f.filename,
+        'size': len(file_bytes)
+    })
+
+@app.route('/api/files/delete/<int:hotel_id>/<file_type>', methods=['DELETE'])
+@login_required
+def delete_saved_file(hotel_id, file_type):
+    conn = get_db()
+    conn.execute("DELETE FROM saved_files WHERE hotel_id=? AND file_type=?",
+                 (hotel_id, file_type))
+    conn.commit()
+    conn.close()
+    return jsonify({'success': True, 'message': f'{FILE_TYPES.get(file_type,file_type)} deleted'})
 
 # ══════════════════════════════════════════════════════════
 # AUTH ROUTES
@@ -755,16 +860,23 @@ def make_d110_vs_gstr1(processed, new_hdrs):
     return wb
 
 def load_and_process():
-    d110f=request.files.get('d110'); backf=request.files.get('backend')
-    einvf=request.files.get('einv')
-    if not d110f or not backf: raise ValueError('D110 + Backend required')
-    d110_rows=get_sheet(read_wb(d110f.read()),'D110 Dr.Base')
-    backend_rows=get_sheet(read_wb(backf.read()),'Backend Trx,SAC_Mapping')
-    gstr_rows=get_sheet(read_wb(einvf.read()),'GSTR-4A_EINV') if einvf else []
-    mapping=build_map(backend_rows)
-    einv_map=build_einv_map(gstr_rows)
-    processed,new_hdrs=process_d110(d110_rows,mapping,einv_map)
-    return processed,new_hdrs,einv_map
+    hotel_id = int(request.form.get('hotel_id', 0))
+    # D110 — required
+    d110_bytes = get_file_bytes(hotel_id, 'd110', 'd110')
+    if not d110_bytes: raise ValueError('D110 Dr.Base file required — upload karo ya saved file use karo')
+    # Backend — required
+    back_bytes = get_file_bytes(hotel_id, 'backend', 'backend')
+    if not back_bytes: raise ValueError('Backend Trx,SAC_Mapping required — upload karo ya saved file use karo')
+    # EINV — optional
+    einv_bytes = get_file_bytes(hotel_id, 'einv', 'einv')
+
+    d110_rows    = get_sheet(read_wb(d110_bytes), 'D110 Dr.Base')
+    backend_rows = get_sheet(read_wb(back_bytes), 'Backend Trx,SAC_Mapping')
+    gstr_rows    = get_sheet(read_wb(einv_bytes), 'GSTR-4A_EINV') if einv_bytes else []
+    mapping      = build_map(backend_rows)
+    einv_map     = build_einv_map(gstr_rows)
+    processed, new_hdrs = process_d110(d110_rows, mapping, einv_map)
+    return processed, new_hdrs, einv_map
 
 # ══════════════════════════════════════════════════════════
 # D110 ROUTES
@@ -1062,10 +1174,12 @@ def make_opera_vs_gl(processed, headers, gl_rows):
 # D140 ROUTES
 # ══════════════════════════════════════════════════════════
 def load_d140():
-    d140f=request.files.get('d140'); backf=request.files.get('backend')
-    if not d140f or not backf: return None,None,None,'D140 + Backend required'
-    d140_rows=get_sheet(read_wb(d140f.read()),'D140 Dr')
-    backend_rows=get_sheet(read_wb(backf.read()),'Backend Trx,SAC_Mapping')
+    hotel_id = int(request.form.get('hotel_id', 0))
+    d140_bytes = get_file_bytes(hotel_id, 'd140', 'd140')
+    back_bytes = get_file_bytes(hotel_id, 'backend', 'backend')
+    if not d140_bytes or not back_bytes: return None,None,None,'D140 + Backend required'
+    d140_rows    = get_sheet(read_wb(d140_bytes), 'D140 Dr')
+    backend_rows = get_sheet(read_wb(back_bytes), 'Backend Trx,SAC_Mapping')
     return d140_rows,backend_rows,None,None
 
 @app.route('/process/d140/step1', methods=['POST'])
