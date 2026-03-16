@@ -507,7 +507,20 @@ def build_einv_map(gstr_rows):
 # D110 PROCESSING (all existing functions preserved)
 # ══════════════════════════════════════════════════════════
 def process_d110(d110_rows, mapping, einv_map):
-    KEEP = 14
+    # Detect columns dynamically from headers
+    hdrs = [str(h or '').strip().upper() for h in (d110_rows[0] or [])]
+    def ci(names):
+        for name in names:
+            try: return hdrs.index(name.upper())
+            except: pass
+        return None
+
+    I_TRX_DESC = ci(['TRX_DESC','TRANSACTION_DESCRIPTION']) or 7
+    I_DEBIT    = ci(['FT_DEBIT','CASHIER_DEBIT','DEBIT']) or 10
+    I_BILL     = ci(['BILL_NO']) or 2
+    I_DATE     = ci(['BILL_GENERATION_DATE']) or 4
+
+    KEEP = len(hdrs) if hdrs else 14
     new_hdrs = list(d110_rows[0])[:KEEP] + [
         'Tax Head','Rate','HSN Description','HSN Code',
         'Rate Check','Invoice Check','GSTIN','Receiver Name',
@@ -519,14 +532,14 @@ def process_d110(d110_rows, mapping, einv_map):
         base = list(row)[:KEEP]
         while len(base) < KEEP: base.append(None)
 
-        trx_desc = str(base[7] or '').strip().lower()
+        trx_desc = str(base[I_TRX_DESC] or '').strip().lower()
         m = mapping.get(trx_desc, {})
         tax_head = m.get('tax_head','')
         rate     = m.get('rate','')
         hsn_desc = m.get('hsn_desc','')
         hsn_code = m.get('hsn_code','')
 
-        try:    debit = float(base[10] or 0)
+        try:    debit = float(base[I_DEBIT] or 0)
         except: debit = 0
 
         rate_str = str(rate).strip().upper() if rate is not None else ''
@@ -541,7 +554,7 @@ def process_d110(d110_rows, mapping, einv_map):
             except:
                 rate_check = debit * -1
 
-        bill_no = str(base[2] or '').strip()
+        bill_no = str(base[I_BILL] or '').strip()
         inv_data = einv_map.get(bill_no, {})
         gstin    = inv_data.get('gstin','')
         rec_name = inv_data.get('name','')
@@ -562,7 +575,7 @@ def process_d110(d110_rows, mapping, einv_map):
 
     # Invoice Check
     bill_rc = defaultdict(float)
-    bill_idx = 2; rc_idx = 18
+    bill_idx = I_BILL; rc_idx = len(hdrs)  # Rate Check is first new col after base
     for row in processed:
         bill = str(row[bill_idx] or '')
         try: bill_rc[bill] += float(row[rc_idx] or 0)
@@ -590,19 +603,19 @@ def make_proc_d110(d110_rows, mapping, einv_map, processed=None, new_hdrs=None):
     return wb, processed, new_hdrs
 
 def make_sales_register(processed, new_hdrs, einv_map):
-    idx = {h:i for i,h in enumerate(new_hdrs)}
-    i_gstin   = idx.get('GSTIN',20)
-    i_recname = idx.get('Receiver Name',21)
-    i_bill    = 2
-    i_date    = 4
-    i_hsndesc = idx.get('HSN Description',16)
-    i_hsncode = idx.get('HSN Code',17)
-    i_invtype = idx.get('Invoice Type',22)
-    i_doctype = idx.get('Document Type',23)
-    i_supply  = idx.get('Supply Type',24)
-    i_rate    = idx.get('Rate',15)
-    i_th      = idx.get('Tax Head',14)
-    i_debit   = 10
+    idx = {str(h).strip():i for i,h in enumerate(new_hdrs)}
+    i_gstin   = idx.get('GSTIN', 20)
+    i_recname = idx.get('Receiver Name', 21)
+    i_bill    = idx.get('BILL_NO', idx.get('Bill No', 2))
+    i_date    = idx.get('BILL_GENERATION_DATE', idx.get('Date', 4))
+    i_hsndesc = idx.get('HSN Description', 16)
+    i_hsncode = idx.get('HSN Code', 17)
+    i_invtype = idx.get('Invoice Type', 22)
+    i_doctype = idx.get('Document Type', 23)
+    i_supply  = idx.get('Supply Type', 24)
+    i_rate    = idx.get('Rate', 15)
+    i_th      = idx.get('Tax Head', 14)
+    i_debit   = idx.get('FT_DEBIT', idx.get('CASHIER_DEBIT', idx.get('FT_Debit', 11)))
 
     TAX_HEADS = ['IGST','CGST','SGST','CESS']
     pivot = defaultdict(lambda:{t:0.0 for t in TAX_HEADS})
