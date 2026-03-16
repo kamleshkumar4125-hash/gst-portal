@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GST Working Portal — Login</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:#f0eeea;min-height:100vh;display:flex;align-items:center;justify-content:center;}
+.card{background:white;border-radius:16px;padding:40px 36px;width:100%;max-width:400px;box-shadow:0 8px 40px rgba(0,0,0,0.1);}
+.logo{display:flex;align-items:center;gap:12px;margin-bottom:32px;}
+.logo-box{width:46px;height:46px;background:linear-gradient(135deg,#ea580c,#f97316);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:white;box-shadow:3px 3px 0 rgba(234,88,12,0.3),6px 6px 0 rgba(234,88,12,0.15);}
+.logo-text{font-size:16px;font-weight:700;color:#1a1a1a;line-height:1.2;}
+.logo-sub{font-size:10px;color:#999;font-family:'IBM Plex Mono',monospace;letter-spacing:1px;}
+h2{font-size:22px;font-weight:800;color:#1a1a1a;margin-bottom:6px;}
+.sub{font-size:13px;color:#888;margin-bottom:28px;}
+label{display:block;font-size:12px;font-weight:600;color:#555;margin-bottom:6px;letter-spacing:0.3px;}
+input{width:100%;padding:11px 14px;border:1.5px solid #e0ddd5;border-radius:8px;font-size:14px;font-family:'Plus Jakarta Sans',sans-serif;outline:none;transition:all 0.2s;margin-bottom:16px;}
+input:focus{border-color:#f97316;box-shadow:0 0 0 3px rgba(249,115,22,0.1);}
+.btn{width:100%;padding:13px;background:#f97316;border:none;border-radius:8px;color:white;font-size:15px;font-weight:700;cursor:pointer;transition:all 0.2s;font-family:'Plus Jakarta Sans',sans-serif;}
+.btn:hover{background:#ea580c;transform:translateY(-1px);box-shadow:0 4px 16px rgba(249,115,22,0.35);}
+.btn:disabled{background:#ddd;color:#aaa;cursor:not-allowed;transform:none;box-shadow:none;}
+.error{background:#fff5f5;border:1.5px solid rgba(192,57,43,0.3);color:#c0392b;padding:10px 14px;border-radius:7px;font-size:13px;margin-bottom:16px;display:none;}
+.error.show{display:block;}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.35);border-top-color:white;border-radius:50%;animation:rot 0.7s linear infinite;vertical-align:middle;margin-right:5px;}
+@keyframes rot{to{transform:rotate(360deg)}}
+.footer{text-align:center;margin-top:24px;font-size:11px;color:#bbb;font-family:'IBM Plex Mono',monospace;}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">
+    <div class="logo-box">TAX</div>
+    <div>
+      <div class="logo-text">GST Working Portal</div>
+      <div class="logo-sub">by Kamlesh · TWG Hotels</div>
+    </div>
+  </div>
+
+  <h2>Welcome back</h2>
+  <p class="sub">Sign in to access your GST processing tools</p>
+
+  <div class="error" id="err"></div>
+
+  <label>Username</label>
+  <input type="text" id="username" placeholder="Enter username" autocomplete="username">
+
+  <label>Password</label>
+  <input type="password" id="password" placeholder="Enter password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+
+  <button class="btn" id="loginBtn" onclick="doLogin()">Sign In</button>
+
+  <div class="footer">v1.0 · GST Compliance Suite</div>
+</div>
+
+<script>
+async function doLogin() {
+  const btn = document.getElementById('loginBtn');
+  const err = document.getElementById('err');
+  const username = document.getElementById('username').value.trim();
+  const password = document.getElementById('password').value.trim();
+  if(!username || !password) { showErr('Please enter username and password'); return; }
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin"></span>Signing in…';
+  err.classList.remove('show');
+  try {
+    const res = await fetch('/login', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({username, password})
+    });
+    const data = await res.json();
+    if(res.ok && data.success) { window.location.href = data.redirect || '/'; }
+    else { showErr(data.error || 'Invalid credentials'); }
+  } catch(e) { showErr('Connection error. Try again.'); }
+  finally { btn.disabled=false; btn.innerHTML='Sign In'; }
+}
+function showErr(msg) {
+  const err = document.getElementById('err');
+  err.textContent = msg;
+  err.classList.add('show');
+}
+</script>
+</body>
+</html>

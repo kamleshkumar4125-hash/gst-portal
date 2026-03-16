@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GST Working Portal — by Kamlesh</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sb-bg:    #787878;
+  --sb-w:     232px;
+  --gold:     #8B7325;
+  --gold2:    #b8940f;
+  --red:      #c0392b;
+  --green:    #27ae60;
+  --accent:   #f97316;
+  --accent2:  #ea580c;
+  --bg:       #f0eeea;
+  --white:    #ffffff;
+  --border:   #e0ddd5;
+  --text:     #1a1a1a;
+  --text2:    #555;
+  --text3:    #999;
+  --sans:     'Plus Jakarta Sans', sans-serif;
+  --mono:     'IBM Plex Mono', monospace;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--sans); background: var(--bg); display: flex; height: 100vh; overflow: hidden; }
+
+/* ══ SIDEBAR ══ */
+.sidebar {
+  width: var(--sb-w); min-width: var(--sb-w);
+  background: var(--sb-bg);
+  display: flex; flex-direction: column;
+  height: 100vh; overflow-y: auto; flex-shrink: 0;
+}
+
+.sb-logo {
+  padding: 18px 14px 14px;
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  border-bottom: 1px solid rgba(0,0,0,0.15); margin-bottom: 4px;
+}
+.logo-box {
+  width: 50px; height: 50px;
+  background: linear-gradient(135deg, var(--accent2), var(--accent));
+  border-radius: 10px; display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 800; color: white;
+  box-shadow: 3px 3px 0 rgba(0,0,0,0.2), 6px 6px 0 rgba(0,0,0,0.1);
+}
+.sb-name { font-size: 13px; font-weight: 700; color: white; text-align: center; line-height: 1.3; }
+.sb-name small { display: block; font-size: 10px; color: rgba(255,255,255,0.45); font-weight: 400; font-family: var(--mono); letter-spacing: 0.5px; margin-top: 1px; }
+
+.sb-group { font-family: var(--mono); font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.35); padding: 8px 13px 3px; }
+
+/* Nav button — PPT white rounded box style */
+.sb-btn {
+  display: flex; align-items: center; gap: 9px;
+  margin: 2px 8px; padding: 8px 11px;
+  background: rgba(255,255,255,0.18);
+  border: none; border-radius: 6px;
+  color: white; font-size: 12px; font-weight: 600;
+  cursor: pointer; transition: all 0.15s; text-align: left;
+  width: calc(100% - 16px); font-family: var(--sans);
+}
+.sb-btn:hover { background: rgba(255,255,255,0.28); }
+.sb-btn.active { background: var(--accent); box-shadow: 0 3px 10px rgba(249,115,22,0.4); }
+.sb-btn .si { font-size: 15px; flex-shrink: 0; width: 20px; text-align: center; }
+.sb-btn .sl { flex: 1; line-height: 1.3; }
+.sb-btn .stag { font-family: var(--mono); font-size: 8px; padding: 1px 5px; border-radius: 3px; background: rgba(255,255,255,0.18); letter-spacing: 1px; flex-shrink: 0; }
+.sb-btn.active .stag { background: rgba(255,255,255,0.22); }
+
+.sb-div { height: 1px; background: rgba(255,255,255,0.1); margin: 5px 12px; }
+
+/* ══ MAIN ══ */
+.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+.topbar {
+  background: white; border-bottom: 2px solid var(--border);
+  padding: 0 26px; height: 52px;
+  display: flex; align-items: center; justify-content: space-between;
+  flex-shrink: 0; box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+.page-title { font-size: 18px; font-weight: 800; color: var(--text); letter-spacing: -0.3px; text-transform: uppercase; }
+.page-title span { color: var(--accent); }
+.topbar-r { display: flex; align-items: center; gap: 12px; }
+.live-pill { display: flex; align-items: center; gap: 5px; font-family: var(--mono); font-size: 11px; color: var(--green); }
+.ldot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); box-shadow: 0 0 5px var(--green); animation: blink 2s infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.4} }
+.tb-tag { font-family: var(--mono); font-size: 10px; padding: 3px 9px; border: 1px solid var(--border); border-radius: 4px; color: var(--text3); letter-spacing: 1px; }
+
+.content { flex: 1; overflow-y: auto; padding: 22px 26px 60px; }
+
+.page { display: none; animation: fi 0.2s ease; }
+.page.active { display: block; }
+@keyframes fi { from{opacity:0;transform:translateY(5px)} to{opacity:1;transform:translateY(0)} }
+
+/* ══ SECTION HEADING ══ */
+.sh { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+.sh h2 { font-size: 11px; font-weight: 700; color: var(--gold); letter-spacing: 2.5px; text-transform: uppercase; white-space: nowrap; }
+.sh-line { flex: 1; height: 1.5px; background: linear-gradient(90deg, var(--gold2), transparent); }
+
+/* ══ 3×3 VARIANCE CARDS — Summary/slide 1 style ══ */
+.grid3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-bottom: 22px; }
+
+.vc {
+  background: white; border-radius: 12px; padding: 20px 18px 16px;
+  border: 2px solid var(--border); transition: all 0.2s; position: relative; overflow: hidden;
+}
+.vc::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; border-radius: 12px 12px 0 0; }
+.vc.r { border-color: #ddb8b3; } .vc.r::before { background: var(--red); }
+.vc.g { border-color: #b0d9bc; } .vc.g::before { background: var(--green); }
+.vc:hover { transform: translateY(-2px); }
+.vc.r:hover { box-shadow: 0 6px 18px rgba(192,57,43,0.12); border-color: var(--red); }
+.vc.g:hover { box-shadow: 0 6px 18px rgba(39,174,96,0.12); border-color: var(--green); }
+
+.vc-title { font-size: 13px; font-weight: 700; color: var(--gold); margin-bottom: 3px; }
+.vc-sub   { font-size: 11px; color: var(--text3); margin-bottom: 14px; font-weight: 500; }
+.vc-val   { font-size: 20px; font-weight: 800; color: var(--text2); font-family: var(--mono); }
+.vc-tag { display: inline-flex; align-items: center; gap: 4px; font-family: var(--mono); font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; padding: 2px 8px; border-radius: 3px; margin-top: 10px; border: 1px solid; }
+.vc-tag.r { color: var(--red);   border-color: rgba(192,57,43,0.3); background: rgba(192,57,43,0.05); }
+.vc-tag.g { color: var(--green); border-color: rgba(39,174,96,0.3);  background: rgba(39,174,96,0.05); }
+
+/* ══ 5 STAT CARDS — Revenue/Output/ITC style ══ */
+.grid5 { display: grid; grid-template-columns: repeat(5,1fr); gap: 12px; margin-bottom: 20px; }
+
+.sc {
+  background: white; border: 1.5px solid var(--border);
+  border-radius: 10px; padding: 14px; text-align: center;
+  transition: all 0.2s;
+}
+.sc:hover { border-color: var(--gold2); box-shadow: 0 4px 14px rgba(0,0,0,0.07); }
+.sc-title { font-size: 12px; font-weight: 700; color: var(--gold); margin-bottom: 2px; line-height: 1.3; }
+.sc-val   { font-size: 18px; font-weight: 800; color: var(--text2); font-family: var(--mono); margin-top: 6px; }
+
+/* ══ KEY MARKERS side panel ══ */
+.overview-wrap { display: flex; gap: 16px; }
+.overview-main { flex: 1; min-width: 0; }
+.overview-side { width: 200px; flex-shrink: 0; }
+
+.km-card { background: white; border: 1.5px solid var(--border); border-radius: 10px; overflow: hidden; }
+.km-head { background: linear-gradient(135deg, #f8f4ec, #f2ede0); padding: 10px 14px; border-bottom: 1px solid var(--border); }
+.km-head span { font-size: 11px; font-weight: 700; color: var(--gold); letter-spacing: 2px; text-transform: uppercase; }
+.km-item { padding: 12px 14px; border-bottom: 1px solid #f5f2ec; }
+.km-item:last-child { border-bottom: none; }
+.km-label { font-size: 12px; font-weight: 600; color: var(--text2); margin-bottom: 3px; }
+.km-val   { font-size: 13px; font-weight: 800; color: var(--text); font-family: var(--mono); }
+
+/* Chart placeholder */
+.chart-ph {
+  background: white; border: 1.5px solid var(--border); border-radius: 10px;
+  padding: 20px; margin-bottom: 16px;
+}
+.chart-ph-title { font-size: 12px; font-weight: 700; color: var(--gold); margin-bottom: 14px; }
+.chart-bars { display: flex; align-items: flex-end; gap: 6px; height: 120px; }
+.bar-group { display: flex; gap: 2px; align-items: flex-end; flex: 1; }
+.bar { border-radius: 3px 3px 0 0; flex: 1; min-width: 6px; }
+.chart-legend { display: flex; gap: 16px; margin-top: 10px; flex-wrap: wrap; }
+.leg-item { display: flex; align-items: center; gap: 5px; font-size: 10px; color: var(--text3); }
+.leg-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+
+/* ══ RECONCILIATION PAGE ══ */
+.reco-btns { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+.reco-btn {
+  display: flex; align-items: center; gap: 12px;
+  padding: 13px 18px; background: white;
+  border: 1.5px solid var(--border); border-radius: 9px;
+  cursor: pointer; transition: all 0.2s; font-family: var(--sans);
+  text-align: left;
+}
+.reco-btn:hover { border-color: var(--gold2); box-shadow: 0 3px 12px rgba(0,0,0,0.07); transform: translateX(3px); }
+.reco-btn.active-reco { border-color: var(--accent); background: #fff8f3; }
+.reco-num { width: 28px; height: 28px; border-radius: 6px; background: linear-gradient(135deg, var(--accent2), var(--accent)); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: white; flex-shrink: 0; }
+.reco-lbl { font-size: 13px; font-weight: 600; color: var(--text); }
+
+.reco-table-wrap { background: white; border: 1.5px solid var(--border); border-radius: 10px; overflow: hidden; }
+.reco-table-head { background: linear-gradient(135deg,#f8f4ec,#f2ede0); padding: 12px 18px; border-bottom: 1px solid var(--border); font-size: 13px; font-weight: 700; color: var(--gold); }
+table.rt { width: 100%; border-collapse: collapse; font-size: 12px; }
+table.rt th { background: #faf7f0; padding: 9px 14px; text-align: left; font-family: var(--mono); font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--gold); border-bottom: 1.5px solid var(--border); }
+table.rt td { padding: 9px 14px; border-bottom: 1px solid #f5f2ec; color: var(--text2); }
+table.rt tr:last-child td { border-bottom: none; }
+table.rt tr:hover td { background: #fffbf5; }
+table.rt td.num { text-align: right; font-family: var(--mono); font-size: 11px; }
+table.rt tr.bold td { font-weight: 700; color: var(--text); background: #f8f4ec; }
+
+/* ══ GST RETURNS TABLE ══ */
+.gstr-section { background: white; border: 2px solid var(--gold2); border-radius: 10px; overflow: hidden; margin-bottom: 16px; }
+.gstr-sec-head { background: var(--gold); padding: 9px 16px; font-size: 12px; font-weight: 700; color: white; letter-spacing: 1px; }
+table.gt { width: 100%; border-collapse: collapse; font-size: 12px; }
+table.gt th { background: #f8f4ec; padding: 8px 14px; text-align: left; font-family: var(--mono); font-size: 10px; letter-spacing: 1px; color: var(--gold); border-bottom: 1px solid var(--border); }
+table.gt td { padding: 8px 14px; border-bottom: 1px solid #f5f2ec; color: var(--text2); }
+table.gt td.num { text-align: right; font-family: var(--mono); font-size: 11px; }
+table.gt tr.total-r td { font-weight: 700; color: white; background: var(--gold); }
+table.gt tr.bold-r td { font-weight: 700; color: var(--text); }
+
+/* ══ D110 UPLOAD + STEPS ══ */
+.upload-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 20px; }
+.up-card { background: white; border: 1.5px solid var(--border); border-radius: 10px; padding: 15px; transition: all 0.2s; }
+.up-card:hover { border-color: var(--accent); }
+.up-card.uploaded { border-color: rgba(39,174,96,0.4); background: #f6fff9; }
+.up-tag   { font-family: var(--mono); font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text3); margin-bottom: 5px; }
+.up-card.uploaded .up-tag { color: var(--green); }
+.up-title { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.up-desc  { font-size: 11px; color: var(--text3); line-height: 1.5; margin-bottom: 12px; }
+.up-status { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text3); margin-bottom: 10px; font-family: var(--mono); }
+.sdot   { width:6px; height:6px; border-radius:50%; background:#ccc; flex-shrink:0; }
+.sdot.g { background:var(--green); box-shadow:0 0 5px var(--green); }
+.sdot.o { background:#f59e0b; animation:blink 1.5s infinite; }
+.up-btn { width:100%; padding:7px; border-radius:6px; background:rgba(249,115,22,0.07); border:1.5px solid rgba(249,115,22,0.25); color:var(--accent); font-size:12px; font-weight:600; cursor:pointer; transition:all 0.18s; font-family:var(--sans); }
+.up-btn:hover { background:var(--accent); color:white; }
+.up-card.uploaded .up-btn { background:rgba(39,174,96,0.08); border-color:rgba(39,174,96,0.3); color:var(--green); }
+input[type="file"] { display:none; }
+
+.steps-card { background:white; border:1.5px solid var(--border); border-radius:12px; overflow:hidden; margin-bottom:20px; }
+.steps-head { background:linear-gradient(135deg,#f8f4ec,#f2ede0); padding:11px 18px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+.steps-head span { font-size:11px; font-weight:700; color:var(--gold); letter-spacing:2px; text-transform:uppercase; }
+
+.step-row { display:flex; align-items:center; gap:13px; padding:12px 18px; border-bottom:1px solid #f0ece4; transition:background 0.15s; position:relative; }
+.step-row:last-child { border-bottom:none; }
+.step-row.disabled { opacity:0.38; pointer-events:none; }
+.step-row.active { background:#fff8f3; }
+.step-row.active::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; background:var(--accent); }
+.step-row.done { background:#f6fff9; }
+.step-row.done::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; background:var(--green); }
+.snum { width:34px; height:34px; min-width:34px; border-radius:7px; border:1.5px solid #ddd; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:700; color:#bbb; background:#fafafa; transition:all 0.25s; }
+.step-row.active .snum { background:var(--accent); border-color:var(--accent); color:white; box-shadow:0 3px 8px rgba(249,115,22,0.3); }
+.step-row.done .snum   { background:var(--green); border-color:var(--green); color:white; }
+.sbody { flex:1; }
+.sname { font-size:13px; font-weight:700; color:var(--text); margin-bottom:2px; }
+.sdesc { font-size:11px; color:var(--text3); line-height:1.4; }
+.sprog { width:110px; height:3px; background:#eee; border-radius:2px; overflow:hidden; margin-top:6px; display:none; }
+.sprog.show { display:block; }
+.spbar { height:100%; width:0%; background:linear-gradient(90deg,var(--accent2),var(--accent)); transition:width 0.3s; }
+.spbar.done-bar { background:var(--green); width:100%; }
+.sacts { display:flex; flex-direction:column; align-items:flex-end; gap:6px; }
+.sbadge { font-family:var(--mono); font-size:9px; padding:2px 7px; border-radius:3px; letter-spacing:1.5px; text-transform:uppercase; border:1px solid; }
+.b-wait  { color:#ccc;          border-color:#e0e0e0; background:#fafafa; }
+.b-ready { color:var(--accent); border-color:rgba(249,115,22,0.35); background:rgba(249,115,22,0.06); }
+.b-run   { color:#d97706;       border-color:rgba(217,119,6,0.35); background:rgba(217,119,6,0.06); }
+.b-done  { color:var(--green);  border-color:rgba(39,174,96,0.35); background:rgba(39,174,96,0.06); }
+.arow { display:flex; align-items:center; gap:5px; }
+.run-btn { padding:6px 15px; border:none; border-radius:6px; font-size:12px; font-weight:700; font-family:var(--sans); cursor:pointer; transition:all 0.2s; background:var(--accent); color:white; }
+.run-btn:hover:not(:disabled) { background:var(--accent2); transform:translateY(-1px); }
+.run-btn:disabled { background:#e0e0e0; color:#aaa; cursor:not-allowed; transform:none; }
+.run-btn.done-btn { background:rgba(39,174,96,0.1); color:var(--green); border:1.5px solid rgba(39,174,96,0.3); }
+@keyframes cartwheel { 0%{transform:rotateY(0deg) scale(1)} 25%{transform:rotateY(90deg) scale(1.1)} 50%{transform:rotateY(180deg) scale(1.12)} 75%{transform:rotateY(270deg) scale(1.08)} 88%{transform:rotateY(380deg) scale(1.02)} 100%{transform:rotateY(360deg) scale(1)} }
+@keyframes cflip { 0%{background:var(--accent)} 50%{background:#0f7a3a} 100%{background:rgba(39,174,96,0.1);color:var(--green)} }
+.run-btn.flipping { animation:cartwheel 0.75s cubic-bezier(0.4,0,0.2,1) forwards, cflip 0.75s ease forwards; pointer-events:none; }
+.icon-btn { width:29px; height:29px; border-radius:6px; border:1.5px solid #ddd; background:#fafafa; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:13px; transition:all 0.18s; flex-shrink:0; }
+.icon-btn:disabled { opacity:0.3; cursor:not-allowed; }
+.icon-btn.pb:not(:disabled):hover { border-color:#3b82f6; background:rgba(59,130,246,0.08); }
+.icon-btn.db:not(:disabled):hover { border-color:var(--green); background:rgba(39,174,96,0.08); }
+
+.dl-section { display:none; background:white; border:1.5px solid var(--border); border-radius:12px; overflow:hidden; margin-bottom:20px; }
+.dl-section.show { display:block; }
+.dl-head { background:linear-gradient(135deg,#f6fff9,#edfaf3); padding:11px 18px; border-bottom:1px solid #d0eedd; }
+.dl-head span { font-size:11px; font-weight:700; color:var(--green); letter-spacing:2px; text-transform:uppercase; }
+.dl-grid { display:flex; flex-wrap:wrap; gap:9px; padding:14px 18px; }
+.dl-item { display:flex; align-items:center; gap:9px; padding:9px 14px; background:#f6fff9; border:1.5px solid rgba(39,174,96,0.25); border-radius:7px; cursor:pointer; transition:all 0.18s; font-family:var(--sans); }
+.dl-item:hover { border-color:var(--green); transform:translateY(-1px); }
+.dl-ico { width:28px; height:28px; border-radius:5px; background:var(--green); display:flex; align-items:center; justify-content:center; font-size:13px; }
+.dl-name { font-size:12px; font-weight:600; color:var(--text); }
+.dl-meta { font-family:var(--mono); font-size:9px; color:var(--text3); }
+
+/* ══ D140 / GSTR COMING SOON ══ */
+.cs-wrap { padding:32px 0; display:flex; flex-direction:column; align-items:center; text-align:center; }
+.cs-icon { font-size:48px; margin-bottom:12px; }
+.cs-title { font-size:21px; font-weight:800; color:var(--text); margin-bottom:7px; }
+.cs-title span { color:var(--accent); }
+.cs-sub { font-size:13px; color:var(--text3); line-height:1.7; max-width:480px; margin-bottom:26px; }
+.btn-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:11px; width:100%; max-width:560px; }
+.cs-btn { display:flex; align-items:center; gap:12px; padding:14px 16px; background:white; border:1.5px solid var(--border); border-radius:10px; cursor:pointer; transition:all 0.2s; text-align:left; font-family:var(--sans); }
+.cs-btn:hover { border-color:#c8b88a; box-shadow:0 4px 14px rgba(0,0,0,0.07); transform:translateY(-2px); }
+.cs-ico { width:38px; height:38px; border-radius:8px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:17px; }
+.ico-o{background:linear-gradient(135deg,var(--accent2),var(--accent))} .ico-g{background:linear-gradient(135deg,#d97706,#f59e0b)} .ico-b{background:linear-gradient(135deg,#1d4ed8,#3b82f6)} .ico-gr{background:linear-gradient(135deg,#15803d,#22c55e)}
+.cs-btn-t { font-size:13px; font-weight:700; color:var(--text); margin-bottom:2px; }
+.cs-btn-d { font-size:11px; color:var(--text3); line-height:1.4; }
+.cs-tag { font-family:var(--mono); font-size:9px; padding:1px 6px; border-radius:3px; background:rgba(217,119,6,0.08); border:1px solid rgba(217,119,6,0.25); color:#d97706; letter-spacing:1px; display:inline-block; margin-top:4px; }
+
+/* ══ MODAL ══ */
+.modal-overlay { position:fixed; inset:0; z-index:500; background:rgba(0,0,0,0.5); backdrop-filter:blur(4px); display:none; align-items:flex-start; justify-content:center; padding:20px; overflow-y:auto; }
+.modal-overlay.open { display:flex; }
+.modal { background:white; border-radius:14px; width:100%; max-width:1080px; margin:auto; overflow:hidden; box-shadow:0 24px 60px rgba(0,0,0,0.18); animation:mIn 0.28s cubic-bezier(0.34,1.4,0.64,1) both; }
+@keyframes mIn { from{opacity:0;transform:scale(0.95)} to{opacity:1;transform:scale(1)} }
+.m-hdr { background:linear-gradient(135deg,#f8f4ec,#f2ede0); border-bottom:1.5px solid var(--border); padding:14px 20px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:10; }
+.m-title-wrap { display:flex; align-items:center; gap:11px; }
+.m-ico { width:34px; height:34px; border-radius:7px; background:linear-gradient(135deg,var(--accent2),var(--accent)); display:flex; align-items:center; justify-content:center; font-size:16px; }
+.m-title { font-size:14px; font-weight:800; color:var(--text); }
+.m-sub { font-family:var(--mono); font-size:9px; color:var(--text3); letter-spacing:1.5px; margin-top:1px; }
+.m-acts { display:flex; align-items:center; gap:9px; }
+.m-dl { display:flex; align-items:center; gap:5px; padding:6px 13px; border-radius:6px; background:rgba(39,174,96,0.08); border:1.5px solid rgba(39,174,96,0.3); color:var(--green); font-size:12px; font-weight:700; cursor:pointer; transition:all 0.18s; font-family:var(--sans); }
+.m-dl:hover { background:var(--green); color:white; }
+.m-close { width:32px; height:32px; border-radius:6px; background:rgba(192,57,43,0.08); border:1.5px solid rgba(192,57,43,0.25); color:var(--red); font-size:16px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.18s; }
+.m-close:hover { background:var(--red); color:white; }
+.m-body { padding:18px 20px; }
+.m-stats { display:flex; gap:9px; flex-wrap:wrap; margin-bottom:15px; }
+.m-chip { display:flex; flex-direction:column; background:#fafaf8; border:1px solid var(--border); padding:7px 12px; border-radius:6px; }
+.m-lbl { font-family:var(--mono); font-size:9px; color:var(--text3); letter-spacing:1px; text-transform:uppercase; }
+.m-val { font-size:14px; font-weight:800; color:var(--text); margin-top:1px; }
+.m-val.o{color:var(--accent)} .m-val.g{color:var(--green)} .m-val.b{color:#2563eb} .m-val.r{color:var(--red)}
+.m-tw { border:1px solid var(--border); border-radius:8px; overflow:auto; max-height:430px; }
+.mt { width:100%; border-collapse:collapse; font-size:12px; white-space:nowrap; }
+.mt thead th { background:linear-gradient(135deg,#f8f4ec,#f2ede0); padding:8px 12px; text-align:left; font-family:var(--mono); font-size:10px; letter-spacing:1px; text-transform:uppercase; color:var(--gold); border-bottom:1.5px solid var(--border); position:sticky; top:0; z-index:1; }
+.mt tbody tr { border-bottom:1px solid #f5f2ec; }
+.mt tbody tr:hover { background:#fffbf5; }
+.mt tbody tr.tr-tot { background:#f8f4ec; border-top:1.5px solid var(--gold2); }
+.mt tbody tr.tr-tot td { font-weight:700; color:var(--gold); }
+.mt td { padding:7px 12px; color:var(--text2); }
+.mt td.num { text-align:right; font-family:var(--mono); font-size:11px; }
+.ptag { display:inline-block; padding:1px 6px; border-radius:3px; font-family:var(--mono); font-size:9px; letter-spacing:1px; text-transform:uppercase; border:1px solid; }
+.ptag.passed{color:var(--green);border-color:rgba(39,174,96,0.3);background:rgba(39,174,96,0.08)}
+.ptag.pending{color:var(--red);border-color:rgba(192,57,43,0.3);background:rgba(192,57,43,0.08)}
+.ptag.b2b{color:#1d4ed8;border-color:rgba(29,78,216,0.3);background:rgba(29,78,216,0.08)}
+.ptag.b2c{color:#d97706;border-color:rgba(217,119,6,0.3);background:rgba(217,119,6,0.08)}
+.m-note { font-family:var(--mono); font-size:10px; color:var(--text3); text-align:center; margin-top:9px; }
+
+/* Toast */
+.toast { position:fixed; bottom:20px; right:20px; min-width:250px; padding:10px 15px; border-radius:8px; display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600; z-index:999; transform:translateY(70px); opacity:0; transition:all 0.3s cubic-bezier(0.34,1.4,0.64,1); box-shadow:0 8px 24px rgba(0,0,0,0.1); }
+.toast.show{transform:translateY(0);opacity:1}
+.toast.success{background:#f0fff6;border:1.5px solid rgba(39,174,96,0.4);color:#15803d}
+.toast.error{background:#fff5f5;border:1.5px solid rgba(192,57,43,0.4);color:var(--red)}
+.toast.info{background:#fff8f3;border:1.5px solid rgba(249,115,22,0.3);color:var(--accent2)}
+.spin{display:inline-block;width:12px;height:12px;border:2px solid rgba(255,255,255,0.35);border-top-color:white;border-radius:50%;animation:rot 0.7s linear infinite;vertical-align:middle;margin-right:4px}
+@keyframes rot{to{transform:rotate(360deg)}}
+::-webkit-scrollbar{width:5px;height:5px} ::-webkit-scrollbar-thumb{background:#d0ccc4;border-radius:3px}
+</style>
+</head>
+<body>
+
+<!-- ══ SIDEBAR ══ -->
+<aside class="sidebar">
+  <div class="sb-logo">
+    <div class="logo-box">TAX</div>
+    <div class="sb-name">GST Working Portal<small>by Kamlesh</small></div>
+  </div>
+
+  <button class="sb-btn" onclick="sw('summary','Summary Dashboard')" id="nav-summary"><span class="si">💬</span><span class="sl">Summary dashboard</span></button>
+
+  <div class="sb-group">Reports</div>
+  <button class="sb-btn" onclick="sw('revenue','Revenue Overview')" id="nav-revenue"><span class="si">💰</span><span class="sl">Revenue overview</span></button>
+  <button class="sb-btn" onclick="sw('output','Output GST Overview')" id="nav-output"><span class="si">📊</span><span class="sl">Output GST overview</span></button>
+  <button class="sb-btn" onclick="sw('itc','Input Tax Credit Overview')" id="nav-itc"><span class="si">📋</span><span class="sl">Input tax credit overview</span></button>
+  <button class="sb-btn" onclick="sw('gstret','GST Returns – 1 & 3B')" id="nav-gstret"><span class="si">🔄</span><span class="sl">GST returns – 1 & 3B</span></button>
+  <button class="sb-btn" onclick="sw('irn','IRN Reconciliation')" id="nav-irn"><span class="si">🔗</span><span class="sl">IRN reconciliation</span></button>
+  <button class="sb-btn" onclick="sw('cs','Compliance Calendar')" id="nav-cal"><span class="si">📅</span><span class="sl">Compliance calendar</span></button>
+  <button class="sb-btn" onclick="sw('cs','Details of Advances')" id="nav-adv"><span class="si">🏦</span><span class="sl">Details of advances</span></button>
+  <button class="sb-btn" onclick="sw('cs','Owners Transactions')" id="nav-own"><span class="si">👥</span><span class="sl">Owners transactions</span></button>
+  <button class="sb-btn" onclick="sw('cs','ITC Reversals')" id="nav-itcrev"><span class="si">📉</span><span class="sl">ITC reversals</span></button>
+  <button class="sb-btn" onclick="sw('cs','TDS & TCS Balance')" id="nav-tds"><span class="si">🪙</span><span class="sl">TDS & TCS balance</span></button>
+  <button class="sb-btn" onclick="sw('cs','SEZ Supplies Without Payment')" id="nav-sez"><span class="si">📈</span><span class="sl">SEZ supplies without payment</span></button>
+  <button class="sb-btn" onclick="sw('cs','Inactive Vendors')" id="nav-vendor"><span class="si">👤</span><span class="sl">Inactive vendors</span></button>
+  <button class="sb-btn" onclick="sw('reco','Reconciliations')" id="nav-reco"><span class="si">🔍</span><span class="sl">Reconciliations</span></button>
+
+  <div class="sb-div"></div>
+  <div class="sb-group">Working Tools</div>
+  <button class="sb-btn active" onclick="sw('d110','D110 — Folio Working')" id="nav-d110"><span class="si">📋</span><span class="sl">D110 — Folio Working</span><span class="stag">LIVE</span></button>
+  <button class="sb-btn" onclick="sw('d140','D140 — Journal by Cashier')" id="nav-d140"><span class="si">📒</span><span class="sl">D140 — Journal by Cashier</span><span class="stag">SOON</span></button>
+  <button class="sb-btn" onclick="sw('gstr','GSTR-1 & 3B Working')" id="nav-gstr"><span class="si">📑</span><span class="sl">GSTR-1 & 3B Working</span><span class="stag">SOON</span></button>
+</aside>
+
+<!-- ══ MAIN ══ -->
+<div class="main">
+  <div class="topbar">
+    <div class="page-title" id="ptitle">D110 — <span>Folio Working</span></div>
+    <div class="topbar-r">
+      <div class="live-pill"><span class="ldot"></span>Online</div>
+      <span id="hotel-name" class="tb-tag">Loading…</span>
+      <span id="user-name" class="tb-tag" style="color:var(--accent)">…</span>
+      <button class="tb-tag" id="admin-link" style="display:none;cursor:pointer;border:1.5px solid rgba(249,115,22,0.3);color:var(--accent);background:rgba(249,115,22,0.06)" onclick="window.location='/admin'">⚙ Admin</button>
+      <button class="tb-tag" style="cursor:pointer;border:1.5px solid #ddd;background:white;color:#c0392b" onclick="window.location='/logout'">Logout</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ══ SUMMARY DASHBOARD ══ -->
+    <div class="page" id="page-summary">
+      <div class="sh"><h2>Variance Summary</h2><div class="sh-line"></div></div>
+      <div class="grid3">
+        <div class="vc r"><div class="vc-title">Revenue Variance</div><div class="vc-sub">Opera vs Peoplesoft</div><div class="vc-val">—</div><div class="vc-tag r">⚠ Pending</div></div>
+        <div class="vc r"><div class="vc-title">Revenue Variance</div><div class="vc-sub">Peoplesoft vs GSTR-3B</div><div class="vc-val">—</div><div class="vc-tag r">⚠ Pending</div></div>
+        <div class="vc g"><div class="vc-title">Revenue Variance</div><div class="vc-sub">GSTR-1 vs GSTR-3B</div><div class="vc-val">—</div><div class="vc-tag g">✓ Ready</div></div>
+        <div class="vc g"><div class="vc-title">Output GST Variance</div><div class="vc-sub">Opera vs Peoplesoft</div><div class="vc-val">—</div><div class="vc-tag g">✓ Ready</div></div>
+        <div class="vc g"><div class="vc-title">Output GST Variance</div><div class="vc-sub">Peoplesoft vs GSTR-3B</div><div class="vc-val">—</div><div class="vc-tag g">✓ Ready</div></div>
+        <div class="vc g"><div class="vc-title">Output GST Variance</div><div class="vc-sub">GSTR-1 vs GSTR-3B</div><div class="vc-val">—</div><div class="vc-tag g">✓ Ready</div></div>
+        <div class="vc g"><div class="vc-title">ITC Availment Variance</div><div class="vc-sub">Computed vs GSTR-3B</div><div class="vc-val">—</div><div class="vc-tag g">✓ Ready</div></div>
+        <div class="vc r"><div class="vc-title">ITC Reversal Variance</div><div class="vc-sub">Computed vs GSTR-3B</div><div class="vc-val">—</div><div class="vc-tag r">⚠ Pending</div></div>
+        <div class="vc r"><div class="vc-title">ITC Missing in GSTR-2B</div><div class="vc-sub">&gt; 180 days</div><div class="vc-val">—</div><div class="vc-tag r">⚠ Pending</div></div>
+      </div>
+    </div>
+
+    <!-- ══ REVENUE OVERVIEW ══ -->
+    <div class="page" id="page-revenue">
+      <div class="sh"><h2>Revenue Overview</h2><div class="sh-line"></div></div>
+      <div class="grid5">
+        <div class="sc"><div class="sc-title">Opera Revenue</div><div class="sc-val">—</div></div>
+        <div class="sc"><div class="sc-title">Peoplesoft Revenue</div><div class="sc-val">—</div></div>
+        <div class="sc"><div class="sc-title">GSTR-1 Revenue</div><div class="sc-val">—</div></div>
+        <div class="sc"><div class="sc-title">GSTR-3B Revenue</div><div class="sc-val">—</div></div>
+        <div class="sc"><div class="sc-title">Owners Revenue</div><div class="sc-val">—</div></div>
+      </div>
+      <div class="overview-wrap">
+        <div class="overview-main">
+          <div class="chart-ph">
+            <div class="chart-ph-title">Revenue Comparison (Monthly)</div>
+            <div class="chart-bars" id="rev-bars"></div>
+            <div class="chart-legend">
+              <div class="leg-item"><div class="leg-dot" style="background:#2c7bb6"></div>Opera</div>
+              <div class="leg-item"><div class="leg-dot" style="background:#8b7325"></div>Peoplesoft</div>
+              <div class="leg-item"><div class="leg-dot" style="background:#8b4513"></div>GSTR-1</div>
+              <div class="leg-item"><div class="leg-dot" style="background:#c0392b"></div>GSTR-3B</div>
+            </div>
+          </div>
+        </div>
+        <div class="overview-side">
+          <div class="km-card">
+            <div class="km-head"><span>Key Markers</span></div>
+            <div class="km-item"><div class="km-label">Opera vs Peoplesoft</div><div class="km-val">—</div></div>
+            <div class="km-item"><div class="km-label">Opera vs GSTR-3B</div><div class="km-val">—</div></div>
+            <div class="km-item"><div class="km-label">Peoplesoft vs GSTR-3B</div><div class="km-val">—</div></div>
+            <div class="km-item"><div class="km-label">GSTR-1 vs GSTR-3B</div><div class="km-val">—</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ OUTPUT GST OVERVIEW ══ -->
+    <div class="page" id="page-output">
+      <div class="sh"><h2>Output GST Overview</h2><div class="sh-line"></div></div>
+      <div class="grid5">
+        <div class="sc"><div class="sc-title">Opera Taxes</div><div class="sc-val">—</div></div>
+        <div class="sc"><div class="sc-title">Peoplesoft Taxes</div><div class="sc-val">—</div></div>
+        <div class="sc"><div class="sc-title">GSTR-1 Taxes</div><div class="sc-val">—</div></div>
+        <div class="sc"><div class="sc-title">GSTR-3B Taxes</div><div class="sc-val">—</div></div>
+        <div class="sc"><div class="sc-title">Owners Taxes</div><div class="sc-val">—</div></div>
+      </div>
+      <div class="overview-wrap">
+        <div class="overview-main">
+          <div class="chart-ph">
+            <div class="chart-ph-title">Output GST Comparison (Monthly)</div>
+            <div class="chart-bars" id="gst-bars"></div>
+            <div class="chart-legend">
+              <div class="leg-item"><div class="leg-dot" style="background:#2c7bb6"></div>Opera</div>
+              <div class="leg-item"><div class="leg-dot" style="background:#8b7325"></div>Peoplesoft</div>
+              <div class="leg-item"><div class="leg-dot" style="background:#8b4513"></div>GSTR-1</div>
+              <div class="leg-item"><div class="leg-dot" style="background:#c0392b"></div>GSTR-3B</div>
+            </div>
+          </div>
+        </div>
+        <div class="overview-side">
+          <div class="km-card">
+            <div class="km-head"><span>Key Markers</span></div>
+            <div class="km-item"><div class="km-label">Opera vs Peoplesoft</div><div class="km-val">—</div></div>
+            <div class="km-item"><div class="km-label">Opera vs GSTR-3B</div><div class="km-val">—</div></div>
+            <div class="km-item"><div class="km-label">Peoplesoft vs GSTR-3B</div><div class="km-val">—</div></div>
+            <div class="km-item"><div class="km-label">GSTR-1 vs GSTR-3B</div><div class="km-val">—</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ INPUT TAX CREDIT OVERVIEW ══ -->
+    <div class="page" id="page-itc">
+      <div class="sh"><h2>Input Tax Credit Overview</h2><div class="sh-line"></div></div>
+      <div class="grid5">
+        <div class="sc"><div class="sc-title">ITC Availed – RCM</div><div class="sc-val">—</div></div>
+        <div class="sc"><div class="sc-title">ITC Availed – All Other</div><div class="sc-val">—</div></div>
+        <div class="sc"><div class="sc-title">Liquor Revenue Reversal</div><div class="sc-val">—</div></div>
+        <div class="sc"><div class="sc-title">5% Revenue Reversal</div><div class="sc-val">—</div></div>
+        <div class="sc"><div class="sc-title">FOC Supplies Reversal</div><div class="sc-val">—</div></div>
+      </div>
+      <div class="overview-wrap">
+        <div class="overview-main">
+          <div class="chart-ph">
+            <div class="chart-ph-title">ITC Missing in GSTR-2B (Monthly)</div>
+            <div class="chart-bars" id="itc-bars"></div>
+            <div class="chart-legend">
+              <div class="leg-item"><div class="leg-dot" style="background:#8b2020"></div>ITC Missing in GSTR-2B</div>
+              <div class="leg-item"><div class="leg-dot" style="background:#555"></div>ITC Missing in Ledgers</div>
+            </div>
+          </div>
+          <div class="chart-ph">
+            <div class="chart-ph-title">ITC Reversal Trend (Monthly)</div>
+            <div class="chart-bars" id="itcrev-bars"></div>
+            <div class="chart-legend">
+              <div class="leg-item"><div class="leg-dot" style="background:#2c7bb6"></div>ITC Reversed in GSTR-3B</div>
+            </div>
+          </div>
+        </div>
+        <div class="overview-side">
+          <div class="km-card">
+            <div class="km-head"><span>Key Markers</span></div>
+            <div class="km-item"><div class="km-label">ITC Availment Deviation<br>Computed vs GSTR-3B</div><div class="km-val">—</div></div>
+            <div class="km-item"><div class="km-label">ITC Reversal Deviation<br>Computed vs GSTR-3B</div><div class="km-val">—</div></div>
+            <div class="km-item"><div class="km-label">Trial Balance vs GSTR-3B</div><div class="km-val">—</div></div>
+            <div class="km-item"><div class="km-label">ECL vs Trial Balance</div><div class="km-val">—</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ GST RETURNS 1 & 3B ══ -->
+    <div class="page" id="page-gstret">
+      <div class="sh"><h2>GST Returns – GSTR-1 & GSTR-3B</h2><div class="sh-line"></div></div>
+      <div class="gstr-section">
+        <div class="gstr-sec-head">GSTR-1</div>
+        <table class="gt">
+          <tr><th>Particulars</th><th>Taxable Value</th><th>IGST</th><th>CGST</th><th>SGST</th><th>Cess</th></tr>
+          <tr><td>B2B</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td></tr>
+          <tr><td>B2C</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td></tr>
+          <tr><td>Credit Notes</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td></tr>
+          <tr><td>Advances Received</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td></tr>
+          <tr><td>Nil Rated / Exempt</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td></tr>
+          <tr><td>Non-GST Supply</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td></tr>
+          <tr class="total-r"><td>Total Liability as per GSTR-1</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td></tr>
+        </table>
+      </div>
+      <div class="gstr-section">
+        <div class="gstr-sec-head">GSTR-3B — Outward Supplies</div>
+        <table class="gt">
+          <tr><th>Particulars</th><th>Taxable Value</th><th>IGST</th><th>CGST</th><th>SGST</th><th>Cess</th></tr>
+          <tr><td>Outward taxable supplies (other than zero rated, nil rated and exempted)</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td></tr>
+          <tr><td>Outward taxable supplies (zero rated)</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td></tr>
+          <tr><td>Other outward supplies (Nil rated, exempted)</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td></tr>
+          <tr><td>Inward supplies (liable to reverse charge)</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td></tr>
+          <tr><td>Non GST outward supplies</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td></tr>
+          <tr class="total-r"><td>Total Liability as per GSTR-3B</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══ IRN RECONCILIATION ══ -->
+    <div class="page" id="page-irn">
+      <div class="sh"><h2>IRN Reconciliation</h2><div class="sh-line"></div></div>
+      <div class="reco-table-wrap">
+        <div class="reco-table-head">IRN vs Sales Register Matching</div>
+        <table class="rt">
+          <tr><th>Invoice No</th><th>IRN Status</th><th>Taxable Value</th><th>IGST</th><th>CGST</th><th>SGST</th><th>Difference</th><th>Remark</th></tr>
+          <tr><td colspan="8" style="text-align:center;padding:30px;color:var(--text3);font-family:var(--mono);font-size:11px">Data will populate after running D110 Folio Working</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══ RECONCILIATIONS ══ -->
+    <div class="page" id="page-reco">
+      <div class="sh"><h2>Reconciliations</h2><div class="sh-line"></div></div>
+      <div style="display:flex;gap:16px">
+        <div style="width:220px;flex-shrink:0">
+          <div class="reco-btns">
+            <div class="reco-btn active-reco" onclick="showReco(this,'reco-ps-g3b')"><div class="reco-num">1</div><div class="reco-lbl">Peoplesoft vs GSTR-3B</div></div>
+            <div class="reco-btn" onclick="showReco(this,'reco-op-ps')"><div class="reco-num">2</div><div class="reco-lbl">Opera vs Peoplesoft</div></div>
+            <div class="reco-btn" onclick="showReco(this,'reco-op-g3b')"><div class="reco-num">3</div><div class="reco-lbl">Opera vs GSTR-3B</div></div>
+            <div class="reco-btn" onclick="showReco(this,'reco-g1-g3b')"><div class="reco-num">4</div><div class="reco-lbl">GSTR-1 vs GSTR-3B</div></div>
+            <div class="reco-btn" onclick="showReco(this,'reco-ir-2b')"><div class="reco-num">5</div><div class="reco-lbl">Input register vs GSTR-2B</div></div>
+            <div class="reco-btn" onclick="showReco(this,'reco-ecl-tb')"><div class="reco-num">6</div><div class="reco-lbl">ITC as per ECL vs Trial Balance</div></div>
+            <div class="reco-btn" onclick="showReco(this,'reco-99c')"><div class="reco-num">7</div><div class="reco-lbl">GSTR-9 & 9C comparison</div></div>
+          </div>
+        </div>
+        <div style="flex:1">
+          <div class="reco-table-wrap" id="reco-ps-g3b">
+            <div class="reco-table-head">Reconciliation — Peoplesoft vs GSTR-3B</div>
+            <table class="rt">
+              <tr><th>Particulars</th><th>Taxable Value</th><th>IGST</th><th>CGST</th><th>SGST</th><th>Cess</th></tr>
+              <tr><td>Revenue and taxes as per Peoplesoft [A]</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td></tr>
+              <tr><td>Revenue and taxes as per GSTR-3B [B]</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td></tr>
+              <tr class="bold"><td><strong>Difference [A-B]</strong></td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td></tr>
+              <tr><td>Net advances</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td></tr>
+              <tr><td>Owners revenue</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td></tr>
+              <tr><td>Debit notes</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td></tr>
+              <tr class="bold"><td><strong>Un-identified difference</strong></td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td></tr>
+            </table>
+          </div>
+          <div class="reco-table-wrap" id="reco-op-ps" style="display:none">
+            <div class="reco-table-head">Reconciliation — Opera vs Peoplesoft</div>
+            <table class="rt"><tr><th>Particulars</th><th>Taxable Value</th><th>IGST</th><th>CGST</th><th>SGST</th><th>Cess</th></tr><tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text3);font-size:11px;font-family:var(--mono)">Data will populate after processing</td></tr></table>
+          </div>
+          <div class="reco-table-wrap" id="reco-op-g3b" style="display:none">
+            <div class="reco-table-head">Reconciliation — Opera vs GSTR-3B</div>
+            <table class="rt"><tr><th>Particulars</th><th>Taxable Value</th><th>IGST</th><th>CGST</th><th>SGST</th><th>Cess</th></tr><tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text3);font-size:11px;font-family:var(--mono)">Data will populate after processing</td></tr></table>
+          </div>
+          <div class="reco-table-wrap" id="reco-g1-g3b" style="display:none">
+            <div class="reco-table-head">Reconciliation — GSTR-1 vs GSTR-3B</div>
+            <table class="rt"><tr><th>Particulars</th><th>Taxable Value</th><th>IGST</th><th>CGST</th><th>SGST</th><th>Cess</th></tr><tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text3);font-size:11px;font-family:var(--mono)">Data will populate after processing</td></tr></table>
+          </div>
+          <div class="reco-table-wrap" id="reco-ir-2b" style="display:none"><div class="reco-table-head">Input Register vs GSTR-2B</div><table class="rt"><tr><td style="text-align:center;padding:24px;color:var(--text3);font-size:11px;font-family:var(--mono)">Data will populate after processing</td></tr></table></div>
+          <div class="reco-table-wrap" id="reco-ecl-tb" style="display:none"><div class="reco-table-head">ITC as per ECL vs Trial Balance</div><table class="rt"><tr><td style="text-align:center;padding:24px;color:var(--text3);font-size:11px;font-family:var(--mono)">Data will populate after processing</td></tr></table></div>
+          <div class="reco-table-wrap" id="reco-99c" style="display:none"><div class="reco-table-head">GSTR-9 & 9C Comparison</div><table class="rt"><tr><td style="text-align:center;padding:24px;color:var(--text3);font-size:11px;font-family:var(--mono)">Data will populate after processing</td></tr></table></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ GENERIC COMING SOON ══ -->
+    <div class="page" id="page-cs">
+      <div class="cs-wrap">
+        <div class="cs-icon">🔧</div>
+        <div class="cs-title" id="cs-title">Section <span>Coming Soon</span></div>
+        <div class="cs-sub">This section is part of the full compliance dashboard. Data will be populated based on your hotel's monthly inputs. Programming in progress.</div>
+      </div>
+    </div>
+
+    <!-- ══ D110 FOLIO WORKING ══ -->
+    <div class="page active" id="page-d110">
+      <div class="sh"><h2>01 — Upload Files</h2><div class="sh-line"></div></div>
+      <div class="upload-grid">
+        <div class="up-card" id="card-backend">
+          <div class="up-tag">Static / One-time</div>
+          <div class="up-title">Backend Trx, SAC Mapping</div>
+          <div class="up-desc">Transaction → HSN / Rate mapping. Upload once per hotel setup.</div>
+          <div class="up-status"><span class="sdot" id="dot-backend"></span><span id="lbl-backend">Not uploaded</span></div>
+          <button class="up-btn" onclick="document.getElementById('f-backend').click()">+ Upload Excel</button>
+          <input type="file" id="f-backend" accept=".xlsx,.xlsm,.xls" onchange="doUpload('backend',this)">
+        </div>
+        <div class="up-card" id="card-d110">
+          <div class="up-tag">Monthly — Required</div>
+          <div class="up-title">D110 Dr. Base</div>
+          <div class="up-desc">Raw D110 debit export from Opera PMS. Required every month.</div>
+          <div class="up-status"><span class="sdot o" id="dot-d110"></span><span id="lbl-d110" style="color:#d97706">Required</span></div>
+          <button class="up-btn" onclick="document.getElementById('f-d110').click()">+ Upload Excel</button>
+          <input type="file" id="f-d110" accept=".xlsx,.xlsm,.xls" onchange="doUpload('d110',this)">
+        </div>
+        <div class="up-card" id="card-einv">
+          <div class="up-tag">Monthly — For Reco</div>
+          <div class="up-title">GSTR-4A E-Invoice</div>
+          <div class="up-desc">E-invoice from GSTN portal. Needed for D110 vs GSTR-1 reco.</div>
+          <div class="up-status"><span class="sdot o" id="dot-einv"></span><span id="lbl-einv" style="color:#d97706">Needed for Step 5</span></div>
+          <button class="up-btn" onclick="document.getElementById('f-einv').click()">+ Upload Excel</button>
+          <input type="file" id="f-einv" accept=".xlsx,.xlsm,.xls" onchange="doUpload('einv',this)">
+        </div>
+      </div>
+
+      <div class="sh"><h2>02 — Process &amp; Download</h2><div class="sh-line"></div></div>
+      <div class="steps-card">
+        <div class="steps-head"><span>Processing Steps</span><div class="live-pill"><span class="ldot"></span>Ready</div></div>
+
+        <div class="step-row disabled" id="step-1"><div class="snum">1</div><div class="sbody"><div class="sname">Proc D110 — Sales Register Base</div><div class="sdesc">D110 Dr. + Backend Mapping → Tagged with Tax Head, HSN, Rate, BOF Code, GSTIN</div><div class="sprog" id="prog-1"><div class="spbar" id="fill-1"></div></div></div><div class="sacts"><span class="sbadge b-wait" id="badge-1">Waiting</span><div class="arow"><button class="run-btn" id="btn-1" disabled onclick="go(1)">Run</button><button class="icon-btn db" id="dl-icon-1" disabled onclick="dlOnly(1)">⬇️</button></div></div></div>
+
+        <div class="step-row disabled" id="step-2"><div class="snum">2</div><div class="sbody"><div class="sname">Sales Register</div><div class="sdesc">Bill-wise pivot — GSTIN, HSN, IGST / CGST / SGST / CESS, Revenue columns</div><div class="sprog" id="prog-2"><div class="spbar" id="fill-2"></div></div></div><div class="sacts"><span class="sbadge b-wait" id="badge-2">Waiting</span><div class="arow"><button class="run-btn" id="btn-2" disabled onclick="go(2)">Run</button><button class="icon-btn pb" id="prev-btn-2" disabled onclick="openPreview(2)">👁️</button><button class="icon-btn db" id="dl-icon-2" disabled onclick="dlOnly(2)">⬇️</button></div></div></div>
+
+        <div class="step-row disabled" id="step-3"><div class="snum">3</div><div class="sbody"><div class="sname">SR No GST — Other Than GST Supplies</div><div class="sdesc">Bill-wise Non-GST &amp; Exempt supplies — separate classification report</div><div class="sprog" id="prog-3"><div class="spbar" id="fill-3"></div></div></div><div class="sacts"><span class="sbadge b-wait" id="badge-3">Waiting</span><div class="arow"><button class="run-btn" id="btn-3" disabled onclick="go(3)">Run</button><button class="icon-btn db" id="dl-icon-3" disabled onclick="dlOnly(3)">⬇️</button></div></div></div>
+
+        <div class="step-row disabled" id="step-4"><div class="snum">4</div><div class="sbody"><div class="sname">HSN Summary</div><div class="sdesc">HSN-wise IGST / CGST / SGST / CESS / Revenue — ready for GSTR-1 filing</div><div class="sprog" id="prog-4"><div class="spbar" id="fill-4"></div></div></div><div class="sacts"><span class="sbadge b-wait" id="badge-4">Waiting</span><div class="arow"><button class="run-btn" id="btn-4" disabled onclick="go(4)">Run</button><button class="icon-btn pb" id="prev-btn-4" disabled onclick="openPreview(4)">👁️</button><button class="icon-btn db" id="dl-icon-4" disabled onclick="dlOnly(4)">⬇️</button></div></div></div>
+
+        <div class="step-row disabled" id="step-5"><div class="snum">5</div><div class="sbody"><div class="sname">D110 vs GSTR-1 Reconciliation</div><div class="sdesc">D110 vs E-Invoice reco — requires GSTR-4A EINV file</div><div class="sprog" id="prog-5"><div class="spbar" id="fill-5"></div></div></div><div class="sacts"><span class="sbadge b-wait" id="badge-5">Waiting</span><div class="arow"><button class="run-btn" id="btn-5" disabled onclick="go(5)">Run</button><button class="icon-btn pb" id="prev-btn-5" disabled onclick="openPreview(5)">👁️</button><button class="icon-btn db" id="dl-icon-5" disabled onclick="dlOnly(5)">⬇️</button></div></div></div>
+      </div>
+
+      <div class="dl-section" id="dl-section">
+        <div class="dl-head"><span>03 — Downloaded Reports</span></div>
+        <div class="dl-grid" id="dl-grid"></div>
+      </div>
+    </div>
+
+    <!-- ══ D140 ══ -->
+    <div class="page" id="page-d140">
+      <!-- D140 UPLOAD + STEPS -->
+      <div class="sh"><h2>01 — Upload Files</h2><div class="sh-line"></div></div>
+      <div class="upload-grid">
+        <div class="up-card" id="d140-card-backend">
+          <div class="up-tag">Static / One-time</div>
+          <div class="up-title">Backend Trx, SAC Mapping</div>
+          <div class="up-desc">TRX Code → Tax Head / Rate / HSN mapping table.</div>
+          <div class="up-status"><span class="sdot" id="d140-dot-backend"></span><span id="d140-lbl-backend">Not uploaded</span></div>
+          <button class="up-btn" onclick="document.getElementById('d140-f-backend').click()">+ Upload Excel</button>
+          <input type="file" id="d140-f-backend" accept=".xlsx,.xlsm,.xls" onchange="d140Upload('backend',this)">
+        </div>
+        <div class="up-card" id="d140-card-d140">
+          <div class="up-tag">Monthly — Required</div>
+          <div class="up-title">D140 Dr (Journal)</div>
+          <div class="up-desc">Raw D140 cashier journal export from Opera PMS.</div>
+          <div class="up-status"><span class="sdot o" id="d140-dot-d140"></span><span id="d140-lbl-d140" style="color:#d97706">Required</span></div>
+          <button class="up-btn" onclick="document.getElementById('d140-f-d140').click()">+ Upload Excel</button>
+          <input type="file" id="d140-f-d140" accept=".xlsx,.xlsm,.xls" onchange="d140Upload('d140',this)">
+        </div>
+        <div class="up-card" id="d140-card-gl">
+          <div class="up-tag">Monthly — For GL Steps</div>
+          <div class="up-title">GL File (Peoplesoft)</div>
+          <div class="up-desc">GL journal export from Peoplesoft. Needed for Steps 3, 4, 5.</div>
+          <div class="up-status"><span class="sdot o" id="d140-dot-gl"></span><span id="d140-lbl-gl" style="color:#d97706">Needed for Steps 3-5</span></div>
+          <button class="up-btn" onclick="document.getElementById('d140-f-gl').click()">+ Upload Excel</button>
+          <input type="file" id="d140-f-gl" accept=".xlsx,.xlsm,.xls" onchange="d140Upload('gl',this)">
+        </div>
+      </div>
+
+      <div class="sh"><h2>02 — Process &amp; Download</h2><div class="sh-line"></div></div>
+      <div class="steps-card">
+        <div class="steps-head"><span>D140 Processing Steps</span><div class="live-pill"><span class="ldot"></span>Ready</div></div>
+
+        <div class="step-row disabled" id="d140-step-1"><div class="snum">1</div><div class="sbody"><div class="sname">Proc D140 — Journal Base</div><div class="sdesc">D140 Dr. + Backend Mapping → Tagged with Tax Head, HSN Code, Rate, BOF Code</div><div class="sprog" id="d140-prog-1"><div class="spbar" id="d140-fill-1"></div></div></div><div class="sacts"><span class="sbadge b-wait" id="d140-badge-1">Waiting</span><div class="arow"><button class="run-btn" id="d140-btn-1" disabled onclick="d140go(1)">Run</button><button class="icon-btn db" id="d140-dl-1" disabled onclick="d140dl(1)">⬇️</button></div></div></div>
+
+        <div class="step-row disabled" id="d140-step-2"><div class="snum">2</div><div class="sbody"><div class="sname">GST Pivot — Cashier-wise Tax Head</div><div class="sdesc">Cashier ID × Tax Head (IGST / CGST / SGST / CESS / REVENUE) pivot with totals</div><div class="sprog" id="d140-prog-2"><div class="spbar" id="d140-fill-2"></div></div></div><div class="sacts"><span class="sbadge b-wait" id="d140-badge-2">Waiting</span><div class="arow"><button class="run-btn" id="d140-btn-2" disabled onclick="d140go(2)">Run</button><button class="icon-btn db" id="d140-dl-2" disabled onclick="d140dl(2)">⬇️</button></div></div></div>
+
+        <div class="step-row disabled" id="d140-step-3"><div class="snum">3</div><div class="sbody"><div class="sname">Proc GL — GL Setup</div><div class="sdesc">GL journal processing — Journal ID, Account, Opera vs Manual/Batch classification</div><div class="sprog" id="d140-prog-3"><div class="spbar" id="d140-fill-3"></div></div></div><div class="sacts"><span class="sbadge b-wait" id="d140-badge-3">Waiting</span><div class="arow"><button class="run-btn" id="d140-btn-3" disabled onclick="d140go(3)">Run</button><button class="icon-btn db" id="d140-dl-3" disabled onclick="d140dl(3)">⬇️</button></div></div></div>
+
+        <div class="step-row disabled" id="d140-step-4"><div class="snum">4</div><div class="sbody"><div class="sname">GL Summary</div><div class="sdesc">Account-wise pivot — Opera vs Manual/Batch amounts with totals</div><div class="sprog" id="d140-prog-4"><div class="spbar" id="d140-fill-4"></div></div></div><div class="sacts"><span class="sbadge b-wait" id="d140-badge-4">Waiting</span><div class="arow"><button class="run-btn" id="d140-btn-4" disabled onclick="d140go(4)">Run</button><button class="icon-btn db" id="d140-dl-4" disabled onclick="d140dl(4)">⬇️</button></div></div></div>
+
+        <div class="step-row disabled" id="d140-step-5"><div class="snum">5</div><div class="sbody"><div class="sname">Opera VS GL Reconciliation</div><div class="sdesc">D140 (Opera) vs GL (SWN) date-wise reconciliation — difference and remark</div><div class="sprog" id="d140-prog-5"><div class="spbar" id="d140-fill-5"></div></div></div><div class="sacts"><span class="sbadge b-wait" id="d140-badge-5">Waiting</span><div class="arow"><button class="run-btn" id="d140-btn-5" disabled onclick="d140go(5)">Run</button><button class="icon-btn db" id="d140-dl-5" disabled onclick="d140dl(5)">⬇️</button></div></div></div>
+
+      </div>
+
+      <div class="dl-section" id="d140-dl-section">
+        <div class="dl-head"><span>03 — Downloaded Reports</span></div>
+        <div class="dl-grid" id="d140-dl-grid"></div>
+      </div>
+    </div>
+
+    <!-- ══ GSTR WORKING ══ -->
+    <div class="page" id="page-gstr">
+      <div class="cs-wrap">
+        <div class="cs-icon">📑</div>
+        <div class="cs-title">GSTR-1 &amp; <span>3B Working</span></div>
+        <div class="cs-sub">Complete GSTR-1 and 3B computation — Sales Register, Ledgers, PR vs 2B, IRN Reco, ITC Summary, Reversal and Month-end Journal entries.</div>
+        <div class="btn-grid">
+          <button class="cs-btn" onclick="comingSoon('GSTR-1 Summary')"><div class="cs-ico ico-b">🧾</div><div><div class="cs-btn-t">GSTR-1 Summary</div><div class="cs-btn-d">B2B, B2C, Credit Notes, Advances — rate-wise</div><span class="cs-tag">COMING SOON</span></div></button>
+          <button class="cs-btn" onclick="comingSoon('GSTR-3B Computation')"><div class="cs-ico ico-b">🔢</div><div><div class="cs-btn-t">GSTR-3B Computation</div><div class="cs-btn-d">Forward charge, RCM, ITC, Reversal, Net payment</div><span class="cs-tag">COMING SOON</span></div></button>
+          <button class="cs-btn" onclick="comingSoon('ITC Summary')"><div class="cs-ico ico-gr">📥</div><div><div class="cs-btn-t">ITC Summary</div><div class="cs-btn-d">PR vs 2B matching, Missing ITC, RCM credit</div><span class="cs-tag">COMING SOON</span></div></button>
+          <button class="cs-btn" onclick="comingSoon('Reco GST vs Ledgers')"><div class="cs-ico ico-o">⚖️</div><div><div class="cs-btn-t">Reco — GST vs Ledgers</div><div class="cs-btn-d">Output & Input — Returns vs GL vs GSTR-2B</div><span class="cs-tag">COMING SOON</span></div></button>
+          <button class="cs-btn" onclick="comingSoon('IRN Reconciliation')"><div class="cs-ico ico-b">🔗</div><div><div class="cs-btn-t">IRN Reconciliation</div><div class="cs-btn-d">E-invoice vs Sales Register — match/mismatch</div><span class="cs-tag">COMING SOON</span></div></button>
+          <button class="cs-btn" onclick="comingSoon('Month End Journal')"><div class="cs-ico ico-g">📓</div><div><div class="cs-btn-t">Month End Journal</div><div class="cs-btn-d">Auto JV — Payment, Reversal, Interhead Adjustment</div><span class="cs-tag">COMING SOON</span></div></button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- content -->
+</div><!-- main -->
+
+<!-- Modal -->
+<div class="modal-overlay" id="modal-overlay" onclick="mOut(event)">
+  <div class="modal">
+    <div class="m-hdr"><div class="m-title-wrap"><div class="m-ico" id="m-ico">📊</div><div><div class="m-title" id="m-title">Preview</div><div class="m-sub" id="m-sub">LOADING…</div></div></div><div class="m-acts"><button class="m-dl" onclick="dlFromModal()">⬇️ Download Excel</button><button class="m-close" onclick="mClose()">✕</button></div></div>
+    <div class="m-body"><div class="m-stats" id="m-stats"></div><div class="m-tw"><table class="mt"><thead id="m-thead"></thead><tbody id="m-tbody"></tbody></table></div><div class="m-note" id="m-note"></div></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// Chart bars builder
+function makeBars(containerId, data, colors, maxH) {
+  const c = document.getElementById(containerId);
+  if(!c) return;
+  const mx = Math.max(...data.flat());
+  const months = ['Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar'];
+  c.innerHTML = data[0].map((_,i)=>{
+    const grp = '<div class="bar-group">' + data.map((d,ci)=>
+      `<div class="bar" style="height:${Math.round((d[i]/mx)*110)}px;background:${colors[ci]}"></div>`
+    ).join('') + '</div>';
+    return grp;
+  }).join('');
+}
+
+// Revenue chart data from PPT
+const revData = [
+  [122254950,89928037,102194496,109178207,99217071,132220614,122918570,160043114,0,0,0,0],
+  [121593110,87655615,99964903,106866066,97325469,129792389,120602513,158142957,0,0,0,0],
+  [128157304,96585606,109372092,114098608,104526149,137278133,129940146,160872926,0,0,0,0],
+  [128157304,96585606,109372092,114176608,104526149,137278133,129940146,160872926,0,0,0,0]
+];
+const gstData = [
+  [20741932,15192401,17378105,18721572,16864954,22748333,21024574,27507600,0,0,0,0],
+  [20741932,15192401,17378105,18721572,16864954,22748333,21024574,27507600,0,0,0,0],
+  [21804355,16390764,18670072,19597884,17820588,23658686,22354601,27656966,0,0,0,0],
+  [21804355,16390764,18670072,19607244,17820588,23658686,22354601,27656966,0,0,0,0]
+];
+const itcData = [[218043,163907,186700,195978,178205,236586,223546,276569,0,0,0,0],[207419,151924,173781,187215,168649,227483,210245,275076,0,0,0,0]];
+const itcRevData = [[328293,423661,631307,393032,548939,808776,513777,791042,0,0,0,0]];
+
+window.addEventListener('load', ()=>{
+  makeBars('rev-bars', revData, ['#2c7bb6','#8b7325','#8b4513','#c0392b']);
+  makeBars('gst-bars', gstData, ['#2c7bb6','#8b7325','#8b4513','#c0392b']);
+  makeBars('itc-bars', itcData, ['#8b2020','#555']);
+  makeBars('itcrev-bars', itcRevData, ['#2c7bb6']);
+});
+
+// Nav switching
+const titles = {
+  summary:'Summary <span>Dashboard</span>',
+  revenue:'Revenue <span>Overview</span>',
+  output:'Output GST <span>Overview</span>',
+  itc:'Input Tax Credit <span>Overview</span>',
+  gstret:'GST Returns – <span>GSTR-1 & 3B</span>',
+  irn:'IRN <span>Reconciliation</span>',
+  reco:'<span>Reconciliations</span>',
+  d110:'D110 — <span>Folio Working</span>',
+  d140:'D140 — <span>Journal by Cashier</span>',
+  gstr:'GSTR-1 & <span>3B Working</span>',
+  cs:'<span>Coming Soon</span>'
+};
+
+function sw(pageId, label) {
+  document.querySelectorAll('.sb-btn').forEach(b=>b.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const pg = document.getElementById('page-'+pageId);
+  if(pg) pg.classList.add('active');
+  else {
+    document.getElementById('cs-title').innerHTML = label + ' <span>— Coming Soon</span>';
+    document.getElementById('page-cs').classList.add('active');
+  }
+  document.getElementById('ptitle').innerHTML = titles[pageId] || label;
+}
+
+// Reco sub-tabs
+function showReco(btn, id) {
+  document.querySelectorAll('.reco-btn').forEach(b=>b.classList.remove('active-reco'));
+  btn.classList.add('active-reco');
+  document.querySelectorAll('.reco-table-wrap').forEach(t=>t.style.display='none');
+  document.getElementById(id).style.display='block';
+}
+
+// D110 logic
+const files={backend:null,d110:null,einv:null};
+const done={1:false,2:false,3:false,4:false,5:false};
+const names={1:'Proc D110',2:'Sales Register',3:'SR No GST',4:'HSN Summary',5:'D110 vs GSTR-1'};
+const icons={1:'📋',2:'📊',3:'📝',4:'🔢',5:'🔍'};
+const fnames={1:'Proc_D110.xlsx',2:'Sales_Register.xlsx',3:'SR_No_GST.xlsx',4:'HSN_Summary.xlsx',5:'D110_Vs_GSTR1_Reco.xlsx'};
+const pData={};
+let curN=null;
+
+function doUpload(key,inp){
+  const f=inp.files[0];if(!f)return;
+  files[key]=f;
+  const card=document.getElementById('card-'+key);
+  const dot=document.getElementById('dot-'+key);
+  const lbl=document.getElementById('lbl-'+key);
+  card.classList.add('uploaded');dot.className='sdot g';
+  const s=f.name.length>22?f.name.slice(0,22)+'…':f.name;
+  lbl.textContent=s;lbl.style.color='#27ae60';
+  card.querySelector('.up-btn').textContent='✓ '+s;
+  toast(f.name+' uploaded','success');chkEnable();
+}
+function chkEnable(){
+  const d=!!files.d110,b=!!files.backend,e=!!files.einv;
+  [1,2,3,4].forEach(n=>{if(d&&b&&!done[n])enStep(n);});
+  if(d&&b&&e&&!done[5])enStep(5);
+}
+function enStep(n){
+  const row=document.getElementById('step-'+n);
+  row.classList.remove('disabled');row.classList.add('active');
+  document.getElementById('badge-'+n).className='sbadge b-ready';document.getElementById('badge-'+n).textContent='Ready';
+  document.getElementById('btn-'+n).disabled=false;
+}
+async function go(n){
+  const row=document.getElementById('step-'+n),badge=document.getElementById('badge-'+n),btn=document.getElementById('btn-'+n),prog=document.getElementById('prog-'+n),fill=document.getElementById('fill-'+n);
+  btn.disabled=true;btn.innerHTML='<span class="spin"></span>Running…';
+  badge.className='sbadge b-run';badge.textContent='Running';row.classList.remove('active');prog.classList.add('show');
+  let pct=0;const iv=setInterval(()=>{pct=Math.min(pct+Math.random()*14,88);fill.style.width=pct+'%';},200);
+  const fd=new FormData();fd.append('d110',files.d110);fd.append('backend',files.backend);if(files.einv)fd.append('einv',files.einv);
+  try{
+    const res=await fetch('/process/step'+n,{method:'POST',body:fd});
+    if(!res.ok){const e=await res.json().catch(()=>({error:'Server error'}));throw new Error(e.error||'Server error');}
+    clearInterval(iv);fill.classList.add('done-bar');
+    const blob=await res.blob();pData[n]={blob};tDl(blob,fnames[n]);await sleep(350);
+    done[n]=true;row.classList.remove('active');row.classList.add('done');
+    badge.className='sbadge b-done';badge.textContent='Done';
+    btn.textContent='✓ Done';btn.classList.add('flipping');await sleep(750);
+    btn.classList.remove('flipping');btn.className='run-btn done-btn';btn.textContent='✓ Done';btn.disabled=true;
+    row.querySelector('.snum').textContent='✓';
+    const pb=document.getElementById('prev-btn-'+n);const di=document.getElementById('dl-icon-'+n);
+    if(pb)pb.disabled=false;if(di)di.disabled=false;
+    addDl(n);toast('Step '+n+' complete — downloading!','success');chkEnable();
+  }catch(e){
+    clearInterval(iv);prog.classList.remove('show');fill.style.width='0%';fill.classList.remove('done-bar');
+    row.classList.add('active');badge.className='sbadge b-ready';badge.textContent='Ready';
+    btn.disabled=false;btn.textContent='Run';toast('Error: '+e.message,'error');
+  }
+}
+function tDl(blob,fname){const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=fname;a.click();URL.revokeObjectURL(url);}
+function dlOnly(n){if(pData[n]?.blob){tDl(pData[n].blob,fnames[n]);toast(names[n]+' downloading!','success');}}
+function dlFromModal(){if(curN)dlOnly(curN);}
+function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
+function addDl(n){
+  document.getElementById('dl-section').classList.add('show');
+  const g=document.getElementById('dl-grid');const d=document.createElement('button');d.className='dl-item';
+  d.innerHTML=`<div class="dl-ico">${icons[n]}</div><div><div class="dl-name">${names[n]}</div><div class="dl-meta">Step ${n} · ${fnames[n]}</div></div>`;d.onclick=()=>dlOnly(n);g.appendChild(d);
+}
+
+// Preview modal
+const mIcons={2:'📊',4:'🔢',5:'🔍'};
+const mSubs={2:'SALES REGISTER · BILL-WISE GST',4:'HSN SUMMARY · TAX BREAKDOWN',5:'D110 VS GSTR-1 · RECO'};
+async function openPreview(n){
+  curN=n;if(!pData[n]?.blob){toast('Run the step first!','error');return;}
+  document.getElementById('m-ico').textContent=mIcons[n];document.getElementById('m-title').textContent=names[n];document.getElementById('m-sub').textContent=mSubs[n];
+  document.getElementById('m-stats').innerHTML='';document.getElementById('m-thead').innerHTML='<tr><th colspan="20" style="text-align:center;color:#aaa;padding:20px">Loading…</th></tr>';document.getElementById('m-tbody').innerHTML='';
+  document.getElementById('modal-overlay').classList.add('open');document.body.style.overflow='hidden';
+  try{const data=await pXlsx(pData[n].blob);if(n===2)rSR(data);else if(n===4)rHSN(data);else if(n===5)rReco(data);}
+  catch(e){document.getElementById('m-thead').innerHTML=`<tr><th style="color:red">Error: ${e.message}</th></tr>`;}
+}
+function mClose(){document.getElementById('modal-overlay').classList.remove('open');document.body.style.overflow='';}
+function mOut(e){if(e.target===document.getElementById('modal-overlay'))mClose();}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')mClose();});
+async function pXlsx(blob){
+  if(!window.XLSX)await new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';s.onload=res;s.onerror=rej;document.head.appendChild(s);});
+  const buf=await blob.arrayBuffer();const wb=XLSX.read(buf,{type:'array'});return XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1,defval:''});
+}
+function fmt(v){if(v===''||v===null||v===undefined)return'—';const n=parseFloat(v);if(isNaN(n))return v;return n.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function rSR(rows){
+  const hi=rows.findIndex(r=>r.some(c=>String(c).includes('GSTIN')||String(c).includes('Bill_no')));
+  const dr=rows.slice((hi<0?3:hi)+1).filter(r=>r.some(c=>c!==''));
+  const body=dr.filter(r=>String(r[0]).toUpperCase()!=='TOTAL');const tot=dr.filter(r=>String(r[0]).toUpperCase()==='TOTAL').pop();
+  const bills=new Set(body.map(r=>r[2])).size;const cgst=body.reduce((s,r)=>s+(parseFloat(r[11])||0),0);const sgst=body.reduce((s,r)=>s+(parseFloat(r[12])||0),0);const rev=body.reduce((s,r)=>s+(parseFloat(r[16])||0),0);const passed=body.filter(r=>String(r[18]).toUpperCase()==='PASSED').length;
+  document.getElementById('m-stats').innerHTML=`<div class="m-chip"><div class="m-lbl">Bills</div><div class="m-val o">${bills.toLocaleString()}</div></div><div class="m-chip"><div class="m-lbl">CGST</div><div class="m-val o">₹${fmt(cgst)}</div></div><div class="m-chip"><div class="m-lbl">SGST</div><div class="m-val o">₹${fmt(sgst)}</div></div><div class="m-chip"><div class="m-lbl">Revenue D110</div><div class="m-val g">₹${fmt(rev)}</div></div><div class="m-chip"><div class="m-lbl">Passed</div><div class="m-val g">${passed}</div></div>`;
+  const cols=[{i:2,l:'Bill No'},{i:3,l:'Date'},{i:0,l:'GSTIN'},{i:4,l:'HSN Desc'},{i:5,l:'HSN Code'},{i:8,l:'Supply'},{i:9,l:'Rate'},{i:10,l:'IGST'},{i:11,l:'CGST'},{i:12,l:'SGST'},{i:13,l:'CESS'},{i:16,l:'Rev D110'},{i:17,l:'Diff'},{i:18,l:'Status'}];
+  document.getElementById('m-thead').innerHTML='<tr>'+cols.map(c=>`<th>${c.l}</th>`).join('')+'</tr>';
+  const numC=new Set([10,11,12,13,16,17]);const tbody=document.getElementById('m-tbody');
+  tbody.innerHTML=body.slice(0,200).map(row=>`<tr>`+cols.map(c=>{const v=row[c.i];if(c.i===18){const t=String(v).toLowerCase();return`<td><span class="ptag ${t==='passed'?'passed':t==='pending'?'pending':''}">${v||'—'}</span></td>`;}if(c.i===8){return`<td><span class="ptag ${String(v).toUpperCase()==='B2B'?'b2b':'b2c'}">${v||'—'}</span></td>`;}if(c.i===9)return`<td class="num">${v?(parseFloat(v)*100).toFixed(0)+'%':'—'}</td>`;if(numC.has(c.i))return`<td class="num">${fmt(v)}</td>`;return`<td>${v||'—'}</td>`;}).join('')+'</tr>').join('');
+  if(tot)tbody.innerHTML+=`<tr class="tr-tot"><td><strong>TOTAL</strong></td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td class="num">${fmt(tot[10])}</td><td class="num">${fmt(tot[11])}</td><td class="num">${fmt(tot[12])}</td><td class="num">${fmt(tot[13])}</td><td class="num">${fmt(tot[16])}</td><td class="num">${fmt(tot[17])}</td><td>—</td></tr>`;
+  document.getElementById('m-note').textContent=`Showing ${Math.min(200,body.length)} of ${body.length} rows · Full data in Excel`;
+}
+function rHSN(rows){
+  const hi=rows.findIndex(r=>r.some(c=>String(c).includes('HSN Code')));
+  const dr=rows.slice((hi<0?2:hi)+1).filter(r=>r.some(c=>c!==''));
+  const body=dr.filter(r=>String(r[0]).toUpperCase()!=='TOTAL');const tot=dr.filter(r=>String(r[0]).toUpperCase()==='TOTAL').pop()||[];
+  document.getElementById('m-stats').innerHTML=`<div class="m-chip"><div class="m-lbl">HSN Entries</div><div class="m-val o">${body.length}</div></div><div class="m-chip"><div class="m-lbl">IGST</div><div class="m-val b">₹${fmt(tot[3])}</div></div><div class="m-chip"><div class="m-lbl">CGST</div><div class="m-val o">₹${fmt(tot[4])}</div></div><div class="m-chip"><div class="m-lbl">SGST</div><div class="m-val o">₹${fmt(tot[5])}</div></div><div class="m-chip"><div class="m-lbl">Revenue</div><div class="m-val g">₹${fmt(tot[7])}</div></div>`;
+  document.getElementById('m-thead').innerHTML='<tr><th>HSN Code</th><th>Description</th><th>Rate</th><th>IGST</th><th>CGST</th><th>SGST</th><th>CESS</th><th>Revenue</th></tr>';
+  const tbody=document.getElementById('m-tbody');
+  tbody.innerHTML=body.map(r=>`<tr><td>${r[0]||'—'}</td><td>${r[1]||'—'}</td><td class="num">${r[2]?(parseFloat(r[2])*100).toFixed(0)+'%':'—'}</td><td class="num">${fmt(r[3])}</td><td class="num">${fmt(r[4])}</td><td class="num">${fmt(r[5])}</td><td class="num">${fmt(r[6])}</td><td class="num">${fmt(r[7])}</td></tr>`).join('');
+  if(tot.length)tbody.innerHTML+=`<tr class="tr-tot"><td><strong>TOTAL</strong></td><td>—</td><td>—</td><td class="num">${fmt(tot[3])}</td><td class="num">${fmt(tot[4])}</td><td class="num">${fmt(tot[5])}</td><td class="num">${fmt(tot[6])}</td><td class="num">${fmt(tot[7])}</td></tr>`;
+  document.getElementById('m-note').textContent=body.length+' HSN entries · GSTR-1 filing ready';
+}
+function rReco(rows){
+  const dr=rows.filter(r=>r[0]&&String(r[0]).trim()!=='');const gstr=dr.find(r=>String(r[0]).includes('GSTR-1'));const d110=dr.find(r=>String(r[0]).includes('D110'));const net=dr.find(r=>String(r[0]).toUpperCase().includes('NET DIFFERENCE'));const diff=gstr&&d110?parseFloat(d110[1]||0)-parseFloat(gstr[1]||0):0;
+  document.getElementById('m-stats').innerHTML=`<div class="m-chip"><div class="m-lbl">GSTR-1 Revenue</div><div class="m-val b">₹${gstr?fmt(gstr[1]):'—'}</div></div><div class="m-chip"><div class="m-lbl">D110 Revenue</div><div class="m-val o">₹${d110?fmt(d110[1]):'—'}</div></div><div class="m-chip"><div class="m-lbl">Difference</div><div class="m-val ${Math.abs(diff)<1000?'g':'r'}">₹${fmt(diff)}</div></div>`;
+  document.getElementById('m-thead').innerHTML='<tr><th>Particular</th><th>Revenue</th><th>IGST</th><th>CGST</th><th>SGST</th><th>CESS</th></tr>';
+  const tbody=document.getElementById('m-tbody');
+  tbody.innerHTML=dr.filter(r=>r[0]!=='Particular').map(r=>{const lbl=String(r[0]);const isBold=lbl.includes('D110')||lbl.includes('GSTR-1')||lbl.toLowerCase().includes('net')||lbl.toLowerCase().includes('differences');const cls=lbl.toLowerCase().includes('net')?'tr-tot':'';const st=isBold?'style="font-weight:700;color:#1a1a1a"':'';return`<tr class="${cls}"><td ${st}>${lbl}</td><td class="num" ${st}>${fmt(r[1])}</td><td class="num" ${st}>${fmt(r[2])}</td><td class="num" ${st}>${fmt(r[3])}</td><td class="num" ${st}>${fmt(r[4])}</td><td class="num" ${st}>${fmt(r[5])}</td></tr>`;}).join('');
+  document.getElementById('m-note').textContent='D110 vs GSTR-1 Reconciliation Statement';
+}
+function comingSoon(n){toast(n+' — Programming in progress!','info');}
+
+// ── D140 Logic ─────────────────────────────────────────────
+const d140Files = { backend: null, d140: null, gl: null };
+const d140Done  = { 1:false, 2:false, 3:false, 4:false, 5:false };
+const d140Names = { 1:'Proc D140', 2:'GST Pivot', 3:'Proc GL', 4:'GL Summary', 5:'Opera VS GL Reco' };
+const d140Icons = { 1:'⚙️', 2:'📊', 3:'🏦', 4:'📋', 5:'🔁' };
+const d140FNames= { 1:'Proc_D140.xlsx', 2:'GST_Pivot.xlsx', 3:'Proc_GL.xlsx', 4:'GL_Summary.xlsx', 5:'Opera_VS_GL_Reco.xlsx' };
+const d140PData = {};
+
+function d140Upload(key, inp) {
+  const f = inp.files[0]; if(!f) return;
+  d140Files[key] = f;
+  const card = document.getElementById('d140-card-'+key);
+  const dot  = document.getElementById('d140-dot-'+key);
+  const lbl  = document.getElementById('d140-lbl-'+key);
+  card.classList.add('uploaded'); dot.className = 'sdot g';
+  const s = f.name.length > 22 ? f.name.slice(0,22)+'…' : f.name;
+  lbl.textContent = s; lbl.style.color = '#27ae60';
+  card.querySelector('.up-btn').textContent = '✓ ' + s;
+  toast(f.name + ' uploaded', 'success');
+  d140CheckEnable();
+}
+
+function d140CheckEnable() {
+  const d = !!d140Files.d140, b = !!d140Files.backend, g = !!d140Files.gl;
+  if(d && b) { [1,2].forEach(n => { if(!d140Done[n]) d140Enable(n); }); }
+  if(g)      { [3,4].forEach(n => { if(!d140Done[n]) d140Enable(n); }); }
+  if(d && b && g) { if(!d140Done[5]) d140Enable(5); }
+}
+
+function d140Enable(n) {
+  const row = document.getElementById('d140-step-'+n);
+  row.classList.remove('disabled'); row.classList.add('active');
+  document.getElementById('d140-badge-'+n).className = 'sbadge b-ready';
+  document.getElementById('d140-badge-'+n).textContent = 'Ready';
+  document.getElementById('d140-btn-'+n).disabled = false;
+}
+
+async function d140go(n) {
+  const row   = document.getElementById('d140-step-'+n);
+  const badge = document.getElementById('d140-badge-'+n);
+  const btn   = document.getElementById('d140-btn-'+n);
+  const prog  = document.getElementById('d140-prog-'+n);
+  const fill  = document.getElementById('d140-fill-'+n);
+
+  btn.disabled = true; btn.innerHTML = '<span class="spin"></span>Running…';
+  badge.className = 'sbadge b-run'; badge.textContent = 'Running';
+  row.classList.remove('active'); prog.classList.add('show');
+
+  let pct = 0;
+  const iv = setInterval(() => { pct = Math.min(pct + Math.random()*14, 88); fill.style.width = pct+'%'; }, 200);
+
+  const fd = new FormData();
+  if(d140Files.d140)    fd.append('d140',    d140Files.d140);
+  if(d140Files.backend) fd.append('backend', d140Files.backend);
+  if(d140Files.gl)      fd.append('gl',      d140Files.gl);
+
+  try {
+    const res = await fetch('/process/d140/step'+n, { method:'POST', body:fd });
+    if(!res.ok) { const e = await res.json().catch(()=>({error:'Server error'})); throw new Error(e.error||'Server error'); }
+    clearInterval(iv); fill.classList.add('done-bar');
+    const blob = await res.blob();
+    d140PData[n] = { blob };
+    tDl(blob, d140FNames[n]);
+    await sleep(350);
+
+    d140Done[n] = true;
+    row.classList.remove('active'); row.classList.add('done');
+    badge.className = 'sbadge b-done'; badge.textContent = 'Done';
+    btn.textContent = '✓ Done'; btn.classList.add('flipping');
+    await sleep(750);
+    btn.classList.remove('flipping'); btn.className = 'run-btn done-btn'; btn.textContent = '✓ Done'; btn.disabled = true;
+    row.querySelector('.snum').textContent = '✓';
+    document.getElementById('d140-dl-'+n).disabled = false;
+    d140AddDl(n);
+    toast('Step '+n+' complete — downloading!', 'success');
+  } catch(e) {
+    clearInterval(iv); prog.classList.remove('show'); fill.style.width='0%'; fill.classList.remove('done-bar');
+    row.classList.add('active'); badge.className='sbadge b-ready'; badge.textContent='Ready';
+    btn.disabled=false; btn.textContent='Run';
+    toast('Error: '+e.message, 'error');
+  }
+}
+
+function d140dl(n) { if(d140PData[n]?.blob) { tDl(d140PData[n].blob, d140FNames[n]); toast(d140Names[n]+' downloading!','success'); } }
+
+function d140AddDl(n) {
+  document.getElementById('d140-dl-section').classList.add('show');
+  const g = document.getElementById('d140-dl-grid');
+  const d = document.createElement('button');
+  d.className = 'dl-item';
+  d.innerHTML = '<div class="dl-ico">'+d140Icons[n]+'</div><div><div class="dl-name">'+d140Names[n]+'</div><div class="dl-meta">Step '+n+' · '+d140FNames[n]+'</div></div>';
+  d.onclick = () => d140dl(n);
+  g.appendChild(d);
+}
+
+// Load user info on start
+async function initPortal() {
+  try {
+    const res = await fetch('/api/me');
+    if(res.status === 401) { window.location='/login'; return; }
+    const data = await res.json();
+    document.getElementById('user-name').textContent = data.full_name || data.username;
+    if(data.hotels && data.hotels.length > 0) {
+      document.getElementById('hotel-name').textContent = data.hotels[0].name;
+    }
+    if(data.role === 'admin') {
+      document.getElementById('admin-link').style.display = 'inline-block';
+    }
+  } catch(e) { window.location='/login'; }
+}
+initPortal();
+
+function toast(msg,type='info'){const t=document.getElementById('toast');const ic=type==='success'?'✓ ':type==='error'?'✕ ':'ℹ ';t.textContent=ic+msg;t.className='toast '+type+' show';setTimeout(()=>t.classList.remove('show'),3500);}
+</script>
+</body>
+</html>
