@@ -862,7 +862,7 @@ def make_d110_vs_gstr1(processed, new_hdrs):
 def load_and_process():
     hotel_id = int(request.form.get('hotel_id', 0))
     # If hotel_id=0, get first available hotel
-    if hotel_id == 1:
+    if hotel_id == 0:
         conn = get_db()
         h = conn.execute("SELECT id FROM hotels LIMIT 1").fetchone()
         conn.close()
