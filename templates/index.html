@@ -1152,12 +1152,6 @@ function d110CheckEnable() {
   if(hasD110 && hasBackend && hasEinv && !done[5]) enStep(5);
 }
 
-// Override go() to include hotel_id
-const _origGo = go;
-async function go(n) {
-  // Inject hotel_id into FormData — handled inside go via hotel_id field
-  await _origGo(n);
-}
 
 function toast(msg,type='info'){const t=document.getElementById('toast');const ic=type==='success'?'✓ ':type==='error'?'✕ ':'ℹ ';t.textContent=ic+msg;t.className='toast '+type+' show';setTimeout(()=>t.classList.remove('show'),3500);}
 </script>
