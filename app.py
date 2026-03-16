@@ -861,6 +861,12 @@ def make_d110_vs_gstr1(processed, new_hdrs):
 
 def load_and_process():
     hotel_id = int(request.form.get('hotel_id', 0))
+    # If hotel_id=0, get first available hotel
+    if hotel_id == 0:
+        conn = get_db()
+        h = conn.execute("SELECT id FROM hotels LIMIT 1").fetchone()
+        conn.close()
+        hotel_id = h['id'] if h else 1
     # D110 — required
     d110_bytes = get_file_bytes(hotel_id, 'd110', 'd110')
     if not d110_bytes: raise ValueError('D110 Dr.Base file required — upload karo ya saved file use karo')
@@ -1175,6 +1181,11 @@ def make_opera_vs_gl(processed, headers, gl_rows):
 # ══════════════════════════════════════════════════════════
 def load_d140():
     hotel_id = int(request.form.get('hotel_id', 0))
+    if hotel_id == 0:
+        conn = get_db()
+        h = conn.execute("SELECT id FROM hotels LIMIT 1").fetchone()
+        conn.close()
+        hotel_id = h['id'] if h else 1
     d140_bytes = get_file_bytes(hotel_id, 'd140', 'd140')
     back_bytes = get_file_bytes(hotel_id, 'backend', 'backend')
     if not d140_bytes or not back_bytes: return None,None,None,'D140 + Backend required'
