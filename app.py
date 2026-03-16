@@ -573,8 +573,9 @@ def process_d110(d110_rows, mapping, einv_map):
 
     return processed, new_hdrs
 
-def make_proc_d110(d110_rows, mapping, einv_map):
-    processed, new_hdrs = process_d110(d110_rows, mapping, einv_map)
+def make_proc_d110(d110_rows, mapping, einv_map, processed=None, new_hdrs=None):
+    if processed is None:
+        processed, new_hdrs = process_d110(d110_rows, mapping, einv_map)
     wb = openpyxl.Workbook()
     ws = wb.active
     ws.title = 'Proc_D110'
@@ -891,13 +892,8 @@ def load_and_process():
 @login_required
 def step1():
     try:
-        d110f=request.files.get('d110'); backf=request.files.get('backend'); einvf=request.files.get('einv')
-        if not d110f or not backf: return jsonify({'error':'D110 + Backend required'}),400
-        d110_rows=get_sheet(read_wb(d110f.read()),'D110 Dr.Base')
-        backend_rows=get_sheet(read_wb(backf.read()),'Backend Trx,SAC_Mapping')
-        gstr_rows=get_sheet(read_wb(einvf.read()),'GSTR-4A_EINV') if einvf else []
-        mapping=build_map(backend_rows); einv_map=build_einv_map(gstr_rows)
-        wb,_,_=make_proc_d110(d110_rows,mapping,einv_map)
+        processed,new_hdrs,einv_map=load_and_process()
+        wb,_,_=make_proc_d110(None,None,None,processed=processed,new_hdrs=new_hdrs)
         save_history('D110','Step 1 - Proc D110','Proc_D110.xlsx')
         return send_wb(wb,'Proc_D110.xlsx')
     except Exception as e:
