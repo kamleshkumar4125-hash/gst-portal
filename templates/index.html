@@ -346,6 +346,46 @@ input[type="file"] { display:none; }
 .fm-del:hover { background:#c0392b; color:white; }
 .fm-del:disabled { opacity:0.3; cursor:not-allowed; }
 .fm-size { font-family:var(--mono); font-size:9px; color:var(--text3); margin-top:4px; }
+
+/* ══ PPT-EXACT STYLES ══ */
+.ppt-topbar{display:flex;align-items:center;gap:16px;justify-content:flex-end;margin-bottom:14px;}
+.ppt-fy,.ppt-mo{display:flex;flex-direction:column;align-items:center;gap:2px;}
+.ppt-fy span,.ppt-mo span{font-size:9px;font-family:var(--mono);letter-spacing:1px;color:var(--text3);text-transform:uppercase;}
+.ppt-fy select,.ppt-mo select{border:1.5px solid #8b7325;border-radius:3px;padding:3px 8px;font-size:11px;color:#8b7325;font-weight:600;background:white;cursor:pointer;outline:none;}
+.ppt-amt{font-size:10px;color:var(--text3);font-family:var(--mono);}
+
+/* Summary Dashboard Cards */
+.sd-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;padding:4px;}
+.sd-card{border-radius:12px;padding:28px 20px;border:2.5px solid;min-height:160px;display:flex;flex-direction:column;justify-content:space-between;}
+.sd-card.red{border-color:#c0392b;background:white;}
+.sd-card.grn{border-color:#2e7d32;background:white;}
+.sd-title{font-size:14px;font-weight:700;color:#8b7325;}
+.sd-sub{font-size:12px;color:#8b7325;margin-top:4px;}
+.sd-val{font-size:13px;font-family:var(--mono);color:#333;margin-top:16px;font-weight:600;}
+
+/* Overview pages */
+.ov-wrap{display:flex;gap:0;height:calc(100vh - 160px);}
+.ov-main{flex:1;padding-right:16px;overflow-y:auto;display:flex;flex-direction:column;gap:12px;}
+.ov-side{width:220px;flex-shrink:0;background:#f5f0e8;padding:0;}
+
+/* KPI row */
+.kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;}
+.kpi-card{border:1.5px solid #8b7325;border-radius:8px;padding:12px 10px;text-align:center;}
+.kpi-title{font-size:11px;font-weight:700;color:#8b7325;line-height:1.3;}
+.kpi-val{font-size:12px;font-family:var(--mono);color:#333;margin-top:6px;font-weight:600;}
+
+/* Chart box */
+.chart-box{background:white;border:1px solid #e0ddd5;border-radius:8px;padding:14px;}
+.chart-box-title{font-size:12px;font-weight:700;color:#8b7325;margin-bottom:10px;}
+.chart-legend-row{display:flex;gap:16px;margin-top:8px;font-size:11px;color:#555;align-items:center;}
+.cl-dot{display:inline-block;width:12px;height:12px;border-radius:2px;margin-right:4px;}
+
+/* Key Markers side */
+.km-head-ppt{background:#8b7325;color:white;font-size:11px;font-weight:800;letter-spacing:2px;text-align:center;padding:10px;text-transform:uppercase;}
+.km-blk{padding:16px 14px;border-bottom:1px solid #e0ddd5;background:white;}
+.km-blk.gray{background:#f5f5f5;}
+.km-blk-label{font-size:11px;font-weight:700;color:#333;line-height:1.4;}
+.km-blk-val{font-size:12px;font-family:var(--mono);color:#555;margin-top:6px;}
 </style>
 </head>
 <body>
@@ -398,126 +438,135 @@ input[type="file"] { display:none; }
 
     <!-- ══ SUMMARY DASHBOARD ══ -->
     <div class="page" id="page-summary">
-      <div class="sh"><h2>Variance Summary</h2><div class="sh-line"></div></div>
-      <div class="grid3">
-        <div class="vc r"><div class="vc-title">Revenue Variance</div><div class="vc-sub">Opera vs Peoplesoft</div><div class="vc-val">—</div><div class="vc-tag r">⚠ Pending</div></div>
-        <div class="vc r"><div class="vc-title">Revenue Variance</div><div class="vc-sub">Peoplesoft vs GSTR-3B</div><div class="vc-val">—</div><div class="vc-tag r">⚠ Pending</div></div>
-        <div class="vc g"><div class="vc-title">Revenue Variance</div><div class="vc-sub">GSTR-1 vs GSTR-3B</div><div class="vc-val">—</div><div class="vc-tag g">✓ Ready</div></div>
-        <div class="vc g"><div class="vc-title">Output GST Variance</div><div class="vc-sub">Opera vs Peoplesoft</div><div class="vc-val">—</div><div class="vc-tag g">✓ Ready</div></div>
-        <div class="vc g"><div class="vc-title">Output GST Variance</div><div class="vc-sub">Peoplesoft vs GSTR-3B</div><div class="vc-val">—</div><div class="vc-tag g">✓ Ready</div></div>
-        <div class="vc g"><div class="vc-title">Output GST Variance</div><div class="vc-sub">GSTR-1 vs GSTR-3B</div><div class="vc-val">—</div><div class="vc-tag g">✓ Ready</div></div>
-        <div class="vc g"><div class="vc-title">ITC Availment Variance</div><div class="vc-sub">Computed vs GSTR-3B</div><div class="vc-val">—</div><div class="vc-tag g">✓ Ready</div></div>
-        <div class="vc r"><div class="vc-title">ITC Reversal Variance</div><div class="vc-sub">Computed vs GSTR-3B</div><div class="vc-val">—</div><div class="vc-tag r">⚠ Pending</div></div>
-        <div class="vc r"><div class="vc-title">ITC Missing in GSTR-2B</div><div class="vc-sub">&gt; 180 days</div><div class="vc-val">—</div><div class="vc-tag r">⚠ Pending</div></div>
+      <div class="ppt-topbar">
+        <div class="ppt-fy"><span>Financial Year</span><select><option>2025-26</option><option>2024-25</option></select></div>
+        <div class="ppt-mo"><span>Month</span><select><option>February 2026</option><option>January 2026</option></select></div>
+        <div class="ppt-amt">Amounts in INR</div>
+      </div>
+      <div class="sd-grid">
+        <div class="sd-card red"><div class="sd-title">Revenue variance</div><div class="sd-sub">Opera vs Peoplesoft</div><div class="sd-val">XXXXXXXXXX</div></div>
+        <div class="sd-card red"><div class="sd-title">Revenue variance</div><div class="sd-sub">Peoplesoft vs GSTR-3B</div><div class="sd-val">XXXXXXXXXX</div></div>
+        <div class="sd-card grn"><div class="sd-title">Revenue variance</div><div class="sd-sub">GSTR-1 vs GSTR-3B</div><div class="sd-val">XXXXXXXXXX</div></div>
+        <div class="sd-card grn"><div class="sd-title">Output GST variance</div><div class="sd-sub">Opera vs Peoplesoft</div><div class="sd-val">XXXXXXXXXX</div></div>
+        <div class="sd-card grn"><div class="sd-title">Output GST variance</div><div class="sd-sub">Peoplesoft vs GSTR-3B</div><div class="sd-val">XXXXXXXXXX</div></div>
+        <div class="sd-card grn"><div class="sd-title">Output GST variance</div><div class="sd-sub">GSTR-1 vs GSTR-3B</div><div class="sd-val">XXXXXXXXXX</div></div>
+        <div class="sd-card grn"><div class="sd-title">ITC availment variance</div><div class="sd-sub">Computed vs GSTR-3B</div><div class="sd-val">XXXXXXXXXX</div></div>
+        <div class="sd-card red"><div class="sd-title">ITC reversal variance</div><div class="sd-sub">Computed vs GSTR-3B</div><div class="sd-val">XXXXXXXXXX</div></div>
+        <div class="sd-card red"><div class="sd-title">ITC missing in GSTR-2B</div><div class="sd-sub">&gt; 180 days</div><div class="sd-val">XXXXXXXXXX</div></div>
       </div>
     </div>
 
     <!-- ══ REVENUE OVERVIEW ══ -->
     <div class="page" id="page-revenue">
-      <div class="sh"><h2>Revenue Overview</h2><div class="sh-line"></div></div>
-      <div class="grid5">
-        <div class="sc"><div class="sc-title">Opera Revenue</div><div class="sc-val">—</div></div>
-        <div class="sc"><div class="sc-title">Peoplesoft Revenue</div><div class="sc-val">—</div></div>
-        <div class="sc"><div class="sc-title">GSTR-1 Revenue</div><div class="sc-val">—</div></div>
-        <div class="sc"><div class="sc-title">GSTR-3B Revenue</div><div class="sc-val">—</div></div>
-        <div class="sc"><div class="sc-title">Owners Revenue</div><div class="sc-val">—</div></div>
+      <div class="ppt-topbar">
+        <div class="ppt-fy"><span>Financial Year</span><select><option>2025-26</option></select></div>
+        <div class="ppt-mo"><span>Month</span><select><option>February 2026</option></select></div>
+        <div class="ppt-amt">Amounts in INR</div>
       </div>
-      <div class="overview-wrap">
-        <div class="overview-main">
-          <div class="chart-ph">
-            <div class="chart-ph-title">Revenue Comparison (Monthly)</div>
-            <div class="chart-bars" id="rev-bars"></div>
-            <div class="chart-legend">
-              <div class="leg-item"><div class="leg-dot" style="background:#2c7bb6"></div>Opera</div>
-              <div class="leg-item"><div class="leg-dot" style="background:#8b7325"></div>Peoplesoft</div>
-              <div class="leg-item"><div class="leg-dot" style="background:#8b4513"></div>GSTR-1</div>
-              <div class="leg-item"><div class="leg-dot" style="background:#c0392b"></div>GSTR-3B</div>
+      <div class="ov-wrap">
+        <div class="ov-main">
+          <div class="kpi-row">
+            <div class="kpi-card"><div class="kpi-title">Opera revenue</div><div class="kpi-val">XXXXXXXXXX</div></div>
+            <div class="kpi-card"><div class="kpi-title">Peoplesoft revenue</div><div class="kpi-val">XXXXXXXXXX</div></div>
+            <div class="kpi-card"><div class="kpi-title">GSTR-1 revenue</div><div class="kpi-val">XXXXXXXXXX</div></div>
+            <div class="kpi-card"><div class="kpi-title">GSTR-3B revenue</div><div class="kpi-val">XXXXXXXXXX</div></div>
+            <div class="kpi-card"><div class="kpi-title">Owners revenue</div><div class="kpi-val">XXXXXXXXXX</div></div>
+          </div>
+          <div class="chart-box">
+            <div class="chart-box-title">Revenue comparison</div>
+            <canvas id="rev-chart" height="200"></canvas>
+            <div class="chart-legend-row">
+              <span class="cl-dot" style="background:#2c6e8a"></span>Opera
+              <span class="cl-dot" style="background:#8b7325"></span>Peoplesoft
+              <span class="cl-dot" style="background:#8b4513"></span>GSTR-1
+              <span class="cl-dot" style="background:#8b1a1a"></span>GSTR-3B
             </div>
           </div>
         </div>
-        <div class="overview-side">
-          <div class="km-card">
-            <div class="km-head"><span>Key Markers</span></div>
-            <div class="km-item"><div class="km-label">Opera vs Peoplesoft</div><div class="km-val">—</div></div>
-            <div class="km-item"><div class="km-label">Opera vs GSTR-3B</div><div class="km-val">—</div></div>
-            <div class="km-item"><div class="km-label">Peoplesoft vs GSTR-3B</div><div class="km-val">—</div></div>
-            <div class="km-item"><div class="km-label">GSTR-1 vs GSTR-3B</div><div class="km-val">—</div></div>
-          </div>
+        <div class="ov-side">
+          <div class="km-head-ppt">KEY MARKERS</div>
+          <div class="km-blk"><div class="km-blk-label">Opera vs Peoplesoft</div><div class="km-blk-val">XXXXXXXXXX</div></div>
+          <div class="km-blk gray"><div class="km-blk-label">Opera vs GSTR-3B</div><div class="km-blk-val">XXXXXXXXXX</div></div>
+          <div class="km-blk"><div class="km-blk-label">Peoplesoft vs GSTR-3B</div><div class="km-blk-val">XXXXXXXXXX</div></div>
+          <div class="km-blk gray"><div class="km-blk-label">GSTR-1 vs GSTR-3B</div><div class="km-blk-val">XXXXXXXXXX</div></div>
         </div>
       </div>
     </div>
 
     <!-- ══ OUTPUT GST OVERVIEW ══ -->
     <div class="page" id="page-output">
-      <div class="sh"><h2>Output GST Overview</h2><div class="sh-line"></div></div>
-      <div class="grid5">
-        <div class="sc"><div class="sc-title">Opera Taxes</div><div class="sc-val">—</div></div>
-        <div class="sc"><div class="sc-title">Peoplesoft Taxes</div><div class="sc-val">—</div></div>
-        <div class="sc"><div class="sc-title">GSTR-1 Taxes</div><div class="sc-val">—</div></div>
-        <div class="sc"><div class="sc-title">GSTR-3B Taxes</div><div class="sc-val">—</div></div>
-        <div class="sc"><div class="sc-title">Owners Taxes</div><div class="sc-val">—</div></div>
+      <div class="ppt-topbar">
+        <div class="ppt-fy"><span>Financial Year</span><select><option>2025-26</option></select></div>
+        <div class="ppt-mo"><span>Month</span><select><option>February 2026</option></select></div>
+        <div class="ppt-amt">Amounts in INR</div>
       </div>
-      <div class="overview-wrap">
-        <div class="overview-main">
-          <div class="chart-ph">
-            <div class="chart-ph-title">Output GST Comparison (Monthly)</div>
-            <div class="chart-bars" id="gst-bars"></div>
-            <div class="chart-legend">
-              <div class="leg-item"><div class="leg-dot" style="background:#2c7bb6"></div>Opera</div>
-              <div class="leg-item"><div class="leg-dot" style="background:#8b7325"></div>Peoplesoft</div>
-              <div class="leg-item"><div class="leg-dot" style="background:#8b4513"></div>GSTR-1</div>
-              <div class="leg-item"><div class="leg-dot" style="background:#c0392b"></div>GSTR-3B</div>
+      <div class="ov-wrap">
+        <div class="ov-main">
+          <div class="kpi-row">
+            <div class="kpi-card"><div class="kpi-title">Opera taxes</div><div class="kpi-val">XXXXXXXXXX</div></div>
+            <div class="kpi-card"><div class="kpi-title">Peoplesoft taxes</div><div class="kpi-val">XXXXXXXXXX</div></div>
+            <div class="kpi-card"><div class="kpi-title">GSTR-1 taxes</div><div class="kpi-val">XXXXXXXXXX</div></div>
+            <div class="kpi-card"><div class="kpi-title">GSTR-3B taxes</div><div class="kpi-val">XXXXXXXXXX</div></div>
+            <div class="kpi-card"><div class="kpi-title">Owners taxes</div><div class="kpi-val">XXXXXXXXXX</div></div>
+          </div>
+          <div class="chart-box">
+            <div class="chart-box-title">Output GST comparison</div>
+            <canvas id="gst-chart" height="200"></canvas>
+            <div class="chart-legend-row">
+              <span class="cl-dot" style="background:#2c6e8a"></span>Opera
+              <span class="cl-dot" style="background:#8b7325"></span>Peoplesoft
+              <span class="cl-dot" style="background:#8b4513"></span>GSTR-1
+              <span class="cl-dot" style="background:#8b1a1a"></span>GSTR-3B
             </div>
           </div>
         </div>
-        <div class="overview-side">
-          <div class="km-card">
-            <div class="km-head"><span>Key Markers</span></div>
-            <div class="km-item"><div class="km-label">Opera vs Peoplesoft</div><div class="km-val">—</div></div>
-            <div class="km-item"><div class="km-label">Opera vs GSTR-3B</div><div class="km-val">—</div></div>
-            <div class="km-item"><div class="km-label">Peoplesoft vs GSTR-3B</div><div class="km-val">—</div></div>
-            <div class="km-item"><div class="km-label">GSTR-1 vs GSTR-3B</div><div class="km-val">—</div></div>
-          </div>
+        <div class="ov-side">
+          <div class="km-head-ppt">KEY MARKERS</div>
+          <div class="km-blk"><div class="km-blk-label">Opera vs Peoplesoft</div><div class="km-blk-val">XXXXXXXXXX</div></div>
+          <div class="km-blk gray"><div class="km-blk-label">Opera vs GSTR-3B</div><div class="km-blk-val">XXXXXXXXXX</div></div>
+          <div class="km-blk"><div class="km-blk-label">Peoplesoft vs GSTR-3B</div><div class="km-blk-val">XXXXXXXXXX</div></div>
+          <div class="km-blk gray"><div class="km-blk-label">GSTR-1 vs GSTR-3B</div><div class="km-blk-val">XXXXXXXXXX</div></div>
         </div>
       </div>
     </div>
 
     <!-- ══ INPUT TAX CREDIT OVERVIEW ══ -->
     <div class="page" id="page-itc">
-      <div class="sh"><h2>Input Tax Credit Overview</h2><div class="sh-line"></div></div>
-      <div class="grid5">
-        <div class="sc"><div class="sc-title">ITC Availed – RCM</div><div class="sc-val">—</div></div>
-        <div class="sc"><div class="sc-title">ITC Availed – All Other</div><div class="sc-val">—</div></div>
-        <div class="sc"><div class="sc-title">Liquor Revenue Reversal</div><div class="sc-val">—</div></div>
-        <div class="sc"><div class="sc-title">5% Revenue Reversal</div><div class="sc-val">—</div></div>
-        <div class="sc"><div class="sc-title">FOC Supplies Reversal</div><div class="sc-val">—</div></div>
+      <div class="ppt-topbar">
+        <div class="ppt-fy"><span>Financial Year</span><select><option>2025-26</option></select></div>
+        <div class="ppt-mo"><span>Month</span><select><option>February 2026</option></select></div>
+        <div class="ppt-amt">Amounts in INR</div>
       </div>
-      <div class="overview-wrap">
-        <div class="overview-main">
-          <div class="chart-ph">
-            <div class="chart-ph-title">ITC Missing in GSTR-2B (Monthly)</div>
-            <div class="chart-bars" id="itc-bars"></div>
-            <div class="chart-legend">
-              <div class="leg-item"><div class="leg-dot" style="background:#8b2020"></div>ITC Missing in GSTR-2B</div>
-              <div class="leg-item"><div class="leg-dot" style="background:#555"></div>ITC Missing in Ledgers</div>
+      <div class="ov-wrap">
+        <div class="ov-main">
+          <div class="kpi-row">
+            <div class="kpi-card"><div class="kpi-title">ITC availed – RCM</div><div class="kpi-val">XXXXXXXXXX</div></div>
+            <div class="kpi-card"><div class="kpi-title">ITC availed – All other ITC</div><div class="kpi-val">XXXXXXXXXX</div></div>
+            <div class="kpi-card"><div class="kpi-title">Liquor revenue reversal</div><div class="kpi-val">XXXXXXXXXX</div></div>
+            <div class="kpi-card"><div class="kpi-title">5% revenue reversal</div><div class="kpi-val">XXXXXXXXXX</div></div>
+            <div class="kpi-card"><div class="kpi-title">FOC supplies reversal</div><div class="kpi-val">XXXXXXXXXX</div></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">
+            <div class="chart-box">
+              <div class="chart-box-title">Input tax credit missing in GSTR-2B</div>
+              <canvas id="itc-chart" height="160"></canvas>
+            </div>
+            <div class="chart-box">
+              <div class="chart-box-title">Input tax credit missing in ledgers</div>
+              <canvas id="itcled-chart" height="160"></canvas>
             </div>
           </div>
-          <div class="chart-ph">
-            <div class="chart-ph-title">ITC Reversal Trend (Monthly)</div>
-            <div class="chart-bars" id="itcrev-bars"></div>
-            <div class="chart-legend">
-              <div class="leg-item"><div class="leg-dot" style="background:#2c7bb6"></div>ITC Reversed in GSTR-3B</div>
-            </div>
+          <div class="chart-box" style="margin-top:12px">
+            <div class="chart-box-title">Input tax credit reversal trend</div>
+            <canvas id="itcrev-chart" height="140"></canvas>
           </div>
         </div>
-        <div class="overview-side">
-          <div class="km-card">
-            <div class="km-head"><span>Key Markers</span></div>
-            <div class="km-item"><div class="km-label">ITC Availment Deviation<br>Computed vs GSTR-3B</div><div class="km-val">—</div></div>
-            <div class="km-item"><div class="km-label">ITC Reversal Deviation<br>Computed vs GSTR-3B</div><div class="km-val">—</div></div>
-            <div class="km-item"><div class="km-label">Trial Balance vs GSTR-3B</div><div class="km-val">—</div></div>
-            <div class="km-item"><div class="km-label">ECL vs Trial Balance</div><div class="km-val">—</div></div>
-          </div>
+        <div class="ov-side">
+          <div class="km-head-ppt">KEY MARKERS</div>
+          <div class="km-blk"><div class="km-blk-label">ITC Availment Deviation<br>Computed vs GSTR-3B</div><div class="km-blk-val">XXXXXXXXXX</div></div>
+          <div class="km-blk gray"><div class="km-blk-label">ITC Reversal Deviation<br>Computed vs GSTR-3B</div><div class="km-blk-val">XXXXXXXXXX</div></div>
+          <div class="km-blk"><div class="km-blk-label">Trial Balance vs GSTR-3B</div><div class="km-blk-val">XXXXXXXXXX</div></div>
+          <div class="km-blk gray"><div class="km-blk-label">ECL vs Trial Balance</div><div class="km-blk-val">XXXXXXXXXX</div></div>
         </div>
       </div>
     </div>
@@ -1158,6 +1207,58 @@ function d110CheckEnable() {
 
 
 function toast(msg,type='info'){const t=document.getElementById('toast');const ic=type==='success'?'✓ ':type==='error'?'✕ ':'ℹ ';t.textContent=ic+msg;t.className='toast '+type+' show';setTimeout(()=>t.classList.remove('show'),3500);}
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+const MONTHS = ['Apr-25','May-25','Jun-25','Jul-25','Aug-25','Sep-25','Oct-25','Nov-25','Dec-25','Jan-26','Feb-26','Mar-26'];
+const DUMMY = [120,95,110,130,105,140,125,180,90,100,160,0];
+
+function mkBar(id, datasets) {
+  const ctx = document.getElementById(id);
+  if(!ctx) return;
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: MONTHS,
+      datasets: datasets
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { size: 9 } } },
+        y: { grid: { color: '#f0eeea' }, ticks: { font: { size: 9 } } }
+      }
+    }
+  });
+}
+
+function initCharts() {
+  mkBar('rev-chart', [
+    { label:'Opera',      data:DUMMY.map(v=>v*1.0), backgroundColor:'#2c6e8a' },
+    { label:'Peoplesoft', data:DUMMY.map(v=>v*0.98), backgroundColor:'#8b7325' },
+    { label:'GSTR-1',     data:DUMMY.map(v=>v*0.97), backgroundColor:'#8b4513' },
+    { label:'GSTR-3B',    data:DUMMY.map(v=>v*0.96), backgroundColor:'#8b1a1a' },
+  ]);
+  mkBar('gst-chart', [
+    { label:'Opera',      data:DUMMY.map(v=>v*0.18), backgroundColor:'#2c6e8a' },
+    { label:'Peoplesoft', data:DUMMY.map(v=>v*0.178), backgroundColor:'#8b7325' },
+    { label:'GSTR-1',     data:DUMMY.map(v=>v*0.177), backgroundColor:'#8b4513' },
+    { label:'GSTR-3B',    data:DUMMY.map(v=>v*0.176), backgroundColor:'#8b1a1a' },
+  ]);
+  mkBar('itc-chart', [
+    { label:'ITC GSTR-2B', data:DUMMY.map(v=>v*0.05), backgroundColor:'#8b1a1a' },
+  ]);
+  mkBar('itcled-chart', [
+    { label:'ITC Ledgers', data:DUMMY.map(v=>v*0.04), backgroundColor:'#555' },
+  ]);
+  mkBar('itcrev-chart', [
+    { label:'ITC Reversed', data:DUMMY.map(v=>v*0.03), backgroundColor:'#2c6e8a' },
+  ]);
+}
+// Init charts when page loads
+setTimeout(initCharts, 500);
 </script>
 </body>
 </html>
